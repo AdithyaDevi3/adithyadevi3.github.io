@@ -1022,17 +1022,47 @@ function CrystalBackground() {
 }
 
 // Component: Header
-function Header() {
+function Header({ route, setRoute }) {
   return (
-    <div className="fixed top-0 left-0 p-6 md:p-8 z-50 pointer-events-none">
-      <div className="pointer-events-auto bg-black/60 backdrop-blur-sm px-4 py-3 rounded-lg border border-cyan-500/20">
-        <h1 className="text-3xl md:text-4xl font-bold text-white tracking-wide">
+    <div className="fixed top-0 left-0 w-full z-50 pointer-events-none">
+      <div className="pointer-events-auto flex items-center justify-between bg-black/60 backdrop-blur-sm px-6 py-4 m-2 rounded-lg border border-cyan-500/20">
+        {/* Left side — name */}
+        <h1 className="text-2xl md:text-3xl font-bold text-white tracking-wide">
           Hi, I'm Adithya
         </h1>
+
+        {/* Right side — nav buttons */}
+        <div className="flex gap-4">
+          <button
+            onClick={() => setRoute('home')}
+            className={`text-cyan-300 hover:text-white transition ${
+              route === 'home' ? 'font-semibold text-white' : ''
+            }`}
+          >
+            Home
+          </button>
+          <button
+            onClick={() => setRoute('about')}
+            className={`text-cyan-300 hover:text-white transition ${
+              route === 'about' ? 'font-semibold text-white' : ''
+            }`}
+          >
+            About
+          </button>
+          <button
+            onClick={() => setRoute('contact')}
+            className={`text-cyan-300 hover:text-white transition ${
+              route === 'contact' ? 'font-semibold text-white' : ''
+            }`}
+          >
+            Contact
+          </button>
+        </div>
       </div>
     </div>
   );
 }
+
 
 // // Component: Navigation
 // function Navigation({ route, setRoute }) {
@@ -1074,36 +1104,75 @@ function Header() {
 //   );
 // }
 // Component: Navigation
-function Navigation() {
-    const scrollToSection = (id) => {
-      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-    };
+// function Navigation() {
+//     const scrollToSection = (id) => {
+//       document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+//     };
   
-    return (
-      <div className="fixed top-0 right-0 p-6 md:p-8 z-50 pointer-events-none">
-        <div className="flex gap-3 pointer-events-auto">
-          <button
-            onClick={() => scrollToSection('home')}
-            className="px-4 py-2 rounded-lg font-medium transition-all bg-black/40 text-cyan-300 hover:bg-black/60 border border-cyan-500/30 backdrop-blur-sm hover:text-white"
-          >
-            Home
-          </button>
-          <button
-            onClick={() => scrollToSection('about')}
-            className="px-4 py-2 rounded-lg font-medium transition-all bg-black/40 text-cyan-300 hover:bg-black/60 border border-cyan-500/30 backdrop-blur-sm hover:text-white"
-          >
-            About
-          </button>
-          <button
-            onClick={() => scrollToSection('contact')}
-            className="px-4 py-2 rounded-lg font-medium transition-all bg-black/40 text-cyan-300 hover:bg-black/60 border border-cyan-500/30 backdrop-blur-sm hover:text-white"
-          >
-            Contact
-          </button>
-        </div>
-      </div>
-    );
-  }
+//     return (
+//       <div className="fixed top-0 right-0 p-6 md:p-8 z-50 pointer-events-none">
+//         <div className="flex gap-3 pointer-events-auto">
+//           <button
+//             onClick={() => scrollToSection('home')}
+//             className="px-4 py-2 rounded-lg font-medium transition-all bg-black/40 text-cyan-300 hover:bg-black/60 border border-cyan-500/30 backdrop-blur-sm hover:text-white"
+//           >
+//             Home
+//           </button>
+//           <button
+//             onClick={() => scrollToSection('about')}
+//             className="px-4 py-2 rounded-lg font-medium transition-all bg-black/40 text-cyan-300 hover:bg-black/60 border border-cyan-500/30 backdrop-blur-sm hover:text-white"
+//           >
+//             About
+//           </button>
+//           <button
+//             onClick={() => scrollToSection('contact')}
+//             className="px-4 py-2 rounded-lg font-medium transition-all bg-black/40 text-cyan-300 hover:bg-black/60 border border-cyan-500/30 backdrop-blur-sm hover:text-white"
+//           >
+//             Contact
+//           </button>
+//         </div>
+//       </div>
+//     );
+//   }
+// Component: Navigation
+// function Navigation({ route, setRoute }) {
+//   return (
+//     <div className="fixed top-0 right-0 p-6 md:p-8 z-50 pointer-events-none">
+//       <div className="flex gap-3 pointer-events-auto">
+//         <button
+//           onClick={() => setRoute('home')}
+//           className={`px-4 py-2 rounded-lg font-medium transition-all ${
+//             route === 'home'
+//               ? 'bg-cyan-500 text-white'
+//               : 'bg-black/40 text-cyan-300 hover:bg-black/60 border border-cyan-500/30'
+//           } backdrop-blur-sm`}
+//         >
+//           Home
+//         </button>
+//         <button
+//           onClick={() => setRoute('about')}
+//           className={`px-4 py-2 rounded-lg font-medium transition-all ${
+//             route === 'about'
+//               ? 'bg-cyan-500 text-white'
+//               : 'bg-black/40 text-cyan-300 hover:bg-black/60 border border-cyan-500/30'
+//           } backdrop-blur-sm`}
+//         >
+//           About
+//         </button>
+//         <button
+//           onClick={() => setRoute('contact')}
+//           className={`px-4 py-2 rounded-lg font-medium transition-all ${
+//             route === 'contact'
+//               ? 'bg-cyan-500 text-white'
+//               : 'bg-black/40 text-cyan-300 hover:bg-black/60 border border-cyan-500/30'
+//           } backdrop-blur-sm`}
+//         >
+//           Contact
+//         </button>
+//       </div>
+//     </div>
+//   );
+// }
 
 // Component: Social Links
 function SocialLinks() {
@@ -1136,91 +1205,83 @@ function SocialLinks() {
       </div>
     );
   }
-  
-// Page: Home
-function HomePage() {
+  // Component: Navigation
+function Navigation({ route, setRoute }) {
   return (
-    <div className="h-full flex items-center justify-center px-8">
-      <div className="max-w-4xl text-center">
-        <h2 className="text-6xl md:text-8xl font-bold text-white mb-6 tracking-wider">
-          Welcome
-        </h2>
-        <p className="text-cyan-300 text-xl md:text-2xl font-light leading-relaxed">
-          Explore the crystalline structure of my portfolio. Drag to rotate, scroll to zoom, and discover more about my work.
-        </p>
+    <div className="fixed top-0 right-0 p-6 md:p-8 z-50 pointer-events-none">
+      <div className="flex gap-3 pointer-events-auto">
+        <button
+          onClick={() => setRoute('home')}
+          className={`px-4 py-2 rounded-lg font-medium transition-all ${
+            route === 'home'
+              ? 'bg-cyan-500 text-white'
+              : 'bg-black/40 text-cyan-300 hover:bg-black/60 border border-cyan-500/30'
+          } backdrop-blur-sm`}
+        >
+          Home
+        </button>
+        <button
+          onClick={() => setRoute('about')}
+          className={`px-4 py-2 rounded-lg font-medium transition-all ${
+            route === 'about'
+              ? 'bg-cyan-500 text-white'
+              : 'bg-black/40 text-cyan-300 hover:bg-black/60 border border-cyan-500/30'
+          } backdrop-blur-sm`}
+        >
+          About
+        </button>
+        <button
+          onClick={() => setRoute('contact')}
+          className={`px-4 py-2 rounded-lg font-medium transition-all ${
+            route === 'contact'
+              ? 'bg-cyan-500 text-white'
+              : 'bg-black/40 text-cyan-300 hover:bg-black/60 border border-cyan-500/30'
+          } backdrop-blur-sm`}
+        >
+          Contact
+        </button>
       </div>
     </div>
   );
 }
 
-// Page: About
-function AboutPage() {
-  return (
-    <div className="h-full flex items-center justify-center px-8">
-      <div className="max-w-3xl bg-black/60 backdrop-blur-md rounded-2xl p-8 md:p-12 border border-cyan-500/20">
-        <h2 className="text-5xl font-bold text-white mb-6 tracking-wider">About Me</h2>
-        <div className="space-y-4 text-cyan-100 text-lg leading-relaxed">
-          <p>
-            I'm a passionate developer and creative technologist who loves building beautiful, interactive experiences.
-          </p>
-          <p>
-            My work combines technical expertise with artistic vision, creating projects that push the boundaries of what's possible on the web.
-          </p>
-          <p>
-            I specialize in 3D graphics, creative coding, and building immersive digital experiences that inspire and delight.
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Page: Contact
-function ContactPage() {
-  return (
-    <div className="h-full flex items-center justify-center px-8">
-      <div className="max-w-3xl bg-black/60 backdrop-blur-md rounded-2xl p-8 md:p-12 border border-cyan-500/20">
-        <h2 className="text-5xl font-bold text-white mb-6 tracking-wider">Get In Touch</h2>
-        <div className="space-y-6 text-cyan-100 text-lg">
-          <p className="leading-relaxed">
-            I'm always excited to collaborate on interesting projects or discuss new opportunities. Feel free to reach out!
-          </p>
-          <div className="space-y-4 mt-8">
-            <a 
-              href="mailto:your.email@example.com" 
-              className="block text-cyan-300 hover:text-cyan-100 transition-colors text-xl"
-            >
-              📧 your.email@example.com
-            </a>
-            <p className="text-cyan-300 text-xl">
-              📍 Based in Your Location
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // Main App
 export default function App() {
   const [route, setRoute] = useState('home');
 
+  // return (
+  //   <div className="relative w-full h-screen bg-black overflow-hidden">
+      
+      
+  //     <div className="relative z-10 h-full">
+  //       <Header />
+        
+  //       <Navigation route={route} setRoute={setRoute} />
+  //       <SocialLinks />
+        
+  //       <div className="pointer-events-auto h-full">
+  //         {route === 'home' && <HomePage />}
+  //         {route === 'about' && <AboutPage />}
+  //         {route === 'contact' && <ContactPage />}
+  //       </div>
+  //     </div>
+  //   </div>
+  // );
   return (
     <div className="relative w-full h-screen bg-black overflow-hidden">
-      <CrystalBackground />
-      
-      <div className="relative z-10 h-full">
-        <Header />
-        <Navigation route={route} setRoute={setRoute} />
-        <SocialLinks />
-        
-        <div className="pointer-events-auto h-full">
-          {route === 'home' && <HomePage />}
-          {route === 'about' && <AboutPage />}
-          {route === 'contact' && <ContactPage />}
-        </div>
+      {/* Fixed elements should be outside main content flow */}
+      <Header />
+      <Navigation route={route} setRoute={setRoute} />
+      <SocialLinks />
+  
+      {/* Main content below */}
+      <div className="relative z-10 h-full pointer-events-auto">
+        {route === 'home' && <HomePage />}
+        {route === 'about' && <AboutPage />}
+        {route === 'contact' && <ContactPage />}
       </div>
     </div>
   );
+  
 }
