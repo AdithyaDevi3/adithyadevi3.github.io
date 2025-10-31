@@ -7,9 +7,9 @@ function Header() {
           Hi, I'm Adithya
         </h1>
         <div className="relative z-10 h-full pointer-events-auto">
-        {route === 'home' && <HomePage />}
+        {/* {route === 'home' && <HomePage />}
         {route === 'about' && <AboutPage />}
-        {route === 'contact' && <ContactPage />}
+        {route === 'contact' && <ContactPage />} */}
       </div>
       </div>
 
