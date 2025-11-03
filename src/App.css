@@ -1,4 +1,4 @@
-/* Replace your src/App.css with this code */
+/* Replace your src/App.css with this code
 
 * {
   margin: 0;
@@ -20,4 +20,14 @@ body {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
+} */
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #000510;
+}
+
+#root {
+  background-color: #000510;
 }
