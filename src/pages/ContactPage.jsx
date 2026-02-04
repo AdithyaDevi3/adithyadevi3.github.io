@@ -14,7 +14,7 @@ function ContactPage() {
               href="mailto:your.email@example.com" 
               className="block text-cyan-300 hover:text-cyan-100 transition-colors text-xl"
             >
-              📧 your.email@example.com
+              📧 adithya.r.@example.com
             </a>
             <p className="text-cyan-300 text-xl">
               📍 Based in Your Location
