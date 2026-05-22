@@ -7,12 +7,13 @@ import Navigation from "./components/Navigation";
 import ContactPage from "./pages/ContactPage";
 import AboutPage from "./pages/AboutPage";
 import HomePage from "./pages/HomePage";
+import TestPage from "./pages/TestPage";
 export default function App() {
   const [route, setRoute] = useState('home');
   return (
     <div >
 
-      <Header />
+      {route === 'home' && <Header />}
       <Navigation route={route} setRoute={setRoute} />
       <SocialLinks />
   
@@ -20,6 +21,7 @@ export default function App() {
         {route === 'home' && <HomePage />}
         {route === 'about' && <AboutPage />}
         {route === 'contact' && <ContactPage /> }
+        {route === 'test' && <TestPage /> }
       </div>
     </div>
   );
