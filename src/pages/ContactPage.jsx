@@ -1,5 +1,5 @@
+import React from 'react';
 
-// Page: Contact
 function ContactPage() {
   return (
     <div className="h-full flex items-center justify-center px-8">
@@ -10,15 +10,13 @@ function ContactPage() {
             I'm always excited to collaborate on interesting projects or discuss new opportunities. Feel free to reach out!
           </p>
           <div className="space-y-4 mt-8">
-            <a 
-              href="mailto:your.email@example.com" 
+            <a
+              href="mailto:adithya.r@example.com"
               className="block text-cyan-300 hover:text-cyan-100 transition-colors text-xl"
             >
-              📧 adithya.r.@example.com
+              ✉️ adithya.r@example.com
             </a>
-            <p className="text-cyan-300 text-xl">
-              📍 Based in Your Location
-            </p>
+            <p className="text-cyan-300 text-xl">📍 Based in Your Location</p>
           </div>
         </div>
       </div>
@@ -26,4 +24,4 @@ function ContactPage() {
   );
 }
 
-  export default ContactPage
+export default ContactPage;
