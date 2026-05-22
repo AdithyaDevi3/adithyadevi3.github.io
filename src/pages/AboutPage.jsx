@@ -1,4 +1,7 @@
-
+import curoLogo from './assets/public/curo-logo.png'
+import novaeLogo from './assets/public/novae-logo.png'
+import ncrLogo from './assets/public/ncr-voyix-logo.png'
+import adobeLogo from './assets/public/adobe-logo.png'
 // Page: About
 function AboutPage() {
   return (
@@ -36,7 +39,7 @@ function AboutPage() {
           {/* Adobe */}
           
           <div style={{marginBottom: 24, paddingBottom: 20, borderBottom: '1px solid rgba(102, 232, 255, 0.1)', display: 'flex', gap: 16, alignItems: 'flex-start'}}>
-            <img src="/adobe-logo.png" alt="Adobe" style={{width: 150, height: 80, objectFit: 'contain', minWidth: 150}} />
+            <img src={adobeLogo} alt="Adobe" style={{width: 150, height: 80, objectFit: 'contain', minWidth: 150}} />
             <div style={{flex: 1}}>
               <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4}}>
                 <h4 style={{fontSize: 18, fontWeight: 600, color: '#ffffff', margin: 0}}>Developer Platforms Intern</h4>
@@ -49,7 +52,7 @@ function AboutPage() {
 
           {/* NCR Voyix */}
           <div style={{marginBottom: 24, paddingBottom: 20, borderBottom: '1px solid rgba(102, 232, 255, 0.1)', display: 'flex', gap: 16, alignItems: 'flex-start'}}>
-            <img src="/ncr-voyix-logo.png" alt="NCR Voyix" style={{ width: 150, height: 80, objectFit: 'contain', minWidth: 150 }} />
+            <img src={ncrLogo} alt="NCR Voyix" style={{ width: 150, height: 80, objectFit: 'contain', minWidth: 150 }} />
             <div style={{flex: 1}}>
               <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4}}>
                 <h4 style={{fontSize: 18, fontWeight: 600, color: '#ffffff', margin: 0}}>Mobile Development Intern</h4>
@@ -62,7 +65,7 @@ function AboutPage() {
 
           {/* Novae */}
           <div style={{marginBottom: 24, paddingBottom: 20, borderBottom: '1px solid rgba(102, 232, 255, 0.1)', display: 'flex', gap: 16, alignItems: 'flex-start'}}>
-            <img src="/novae-logo.png" alt="Novae" style={{width: 150, height: 80, objectFit: 'contain', minWidth: 150}} />
+            <img src={novaeLogo} alt="Novae" style={{width: 150, height: 80, objectFit: 'contain', minWidth: 150}} />
             <div style={{flex: 1}}>
               <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4}}>
                 <h4 style={{fontSize: 18, fontWeight: 600, color: '#ffffff', margin: 0}}>Software Engineering Intern</h4>
@@ -78,7 +81,7 @@ function AboutPage() {
         <div>
           <h3 style={{ fontSize: 24, fontWeight: 700, color: '#e6fbff', marginBottom: 20, marginTop: 0 }}>Research</h3>
           <div style={{marginBottom: 24, paddingBottom: 20, borderBottom: '1px solid rgba(102, 232, 255, 0.1)', display: 'flex', gap: 16, alignItems: 'flex-start'}}>
-            <img src="/curo-logo.png" alt="Curo" style={{ width: 200, height: 60, objectFit: 'contain', minWidth: 200 }} />
+            <img src={curoLogo} alt="Curo" style={{ width: 200, height: 60, objectFit: 'contain', minWidth: 200 }} />
             <div style={{flex: 1}}>
               <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4}}>
               <h4 style={{fontSize: 18, fontWeight: 600, color: '#ffffff', margin: 0}}>Undergraduate Research</h4>
