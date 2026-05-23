@@ -18,7 +18,6 @@ function AboutPage() {
               padding: '10px 16px',
               background: 'rgba(7, 13, 14, 0.2)',
               color: '#e6fbff',
-              // border: '1px solid rgba(102, 232, 255, 0.4)',
               borderRadius: 4,
               textDecoration: 'none',
               fontWeight: 600,
