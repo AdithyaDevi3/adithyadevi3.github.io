@@ -2,6 +2,7 @@ import curoLogo from './assets/public/curo-logo.png'
 import novaeLogo from './assets/public/novae-logo.png'
 import ncrLogo from './assets/public/ncr-voyix-logo.png'
 import adobeLogo from './assets/public/adobe-logo.png'
+import resume from './assets/public/Adithya_Devi_Resume.pdf'
 // Page: About
 function AboutPage() {
   return (
@@ -10,7 +11,7 @@ function AboutPage() {
         <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32}}>
           <h2 style={{fontSize: 40, fontWeight: 700, color: '#ffffff', margin: 0}}>About</h2>
           <a 
-            href="public/Adithya_Devi_Resume.pdf" 
+            href={resume} 
             target="_blank" 
             rel="noopener noreferrer"
             style={{
