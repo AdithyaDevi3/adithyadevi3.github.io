@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { portfolioEntries } from '../data/portfolioData';
+import { initialConnections, initialPortfolioEntries } from '../data/portfolioData';
 
-function CareerGalaxy({ onSelectEntry, selectedEntryId }) {
+function CareerGalaxy({ onSelectEntry, selectedEntryId, entries = initialPortfolioEntries, connections = initialConnections }) {
   const [phase, setPhase] = useState(0);
   const [hoveredId, setHoveredId] = useState(null);
 
@@ -18,12 +18,12 @@ function CareerGalaxy({ onSelectEntry, selectedEntryId }) {
   }, []);
 
   const focusEntry = useMemo(() => {
-    return portfolioEntries.find((entry) => entry.id === selectedEntryId) ?? portfolioEntries[0];
-  }, [selectedEntryId]);
+    return entries.find((entry) => entry.id === selectedEntryId) ?? entries[0];
+  }, [entries, selectedEntryId]);
 
   const stars = useMemo(() => {
-    const focusIndex = portfolioEntries.findIndex((entry) => entry.id === focusEntry.id);
-    return portfolioEntries.map((entry, index) => {
+    const focusIndex = entries.findIndex((entry) => entry.id === focusEntry.id);
+    return entries.map((entry, index) => {
       const angle = phase * entry.orbitSpeed + index * 0.9;
       const radius = entry.orbitRadius * 0.9;
       const baseX = Math.cos(angle) * radius;
@@ -43,7 +43,7 @@ function CareerGalaxy({ onSelectEntry, selectedEntryId }) {
         glow: 0.7 + Math.sin(phase * 3 + index * 0.8) * 0.2
       };
     });
-  }, [focusEntry.id, phase]);
+  }, [entries, focusEntry.id, phase]);
 
   const nebulaLayers = useMemo(() => [
     { left: '8%', top: '12%', size: '38%', color: 'rgba(47, 101, 255, 0.16)' },
@@ -93,20 +93,25 @@ function CareerGalaxy({ onSelectEntry, selectedEntryId }) {
           }}
         />
       ))}
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.25 }}>
-        {stars.map((entry) => (
-          <line
-            key={`route-${entry.id}`}
-            x1="50"
-            y1="50"
-            x2={50 + entry.x * 0.9}
-            y2={50 + entry.y * 0.9}
-            stroke={entry.color}
-            strokeWidth="0.2"
-            strokeDasharray="0.4 0.4"
-            opacity="0.6"
-          />
-        ))}
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.3 }}>
+        {connections.map((connection) => {
+          const fromEntry = entries.find((entry) => entry.id === connection.fromId);
+          const toEntry = entries.find((entry) => entry.id === connection.toId);
+          if (!fromEntry || !toEntry) return null;
+          return (
+            <line
+              key={connection.id}
+              x1={50 + fromEntry.x * 0.9}
+              y1={50 + fromEntry.y * 0.9}
+              x2={50 + toEntry.x * 0.9}
+              y2={50 + toEntry.y * 0.9}
+              stroke={connection.color}
+              strokeWidth="0.22"
+              strokeDasharray="0.7 0.4"
+              opacity="0.8"
+            />
+          );
+        })}
       </svg>
       <div style={{ position: 'absolute', left: '50%', top: '50%', width: 180, height: 180, transform: 'translate(-50%, -50%)', borderRadius: '50%', border: '1px solid rgba(125, 217, 255, 0.25)', boxShadow: '0 0 42px rgba(66, 200, 255, 0.16), inset 0 0 60px rgba(65, 211, 255, 0.08)', background: 'radial-gradient(circle, rgba(41, 152, 255, 0.2), rgba(6, 12, 28, 0.06) 65%, transparent 100%)' }} />
 
@@ -138,6 +143,11 @@ function CareerGalaxy({ onSelectEntry, selectedEntryId }) {
           >
             <div style={{ width: isActive ? 22 : 16, height: isActive ? 22 : 16, borderRadius: '50%', background: entry.color, boxShadow: `0 0 ${isActive ? 28 : 18}px ${entry.accent}`, border: `1px solid ${entry.accent}`, transform: `scale(${entry.scale})`, transition: 'transform 0.24s ease, box-shadow 0.24s ease, width 0.24s ease, height 0.24s ease' }} />
             <span style={{ fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', opacity: isActive ? 1 : 0.82, color: isActive ? '#ffffff' : '#a9e3ff', textShadow: '0 0 10px rgba(255,255,255,0.18)' }}>{entry.name}</span>
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 4, maxWidth: 90 }}>
+              {entry.projects.slice(0, 2).map((project) => (
+                <span key={project.name} style={{ width: 5, height: 5, borderRadius: '50%', background: entry.accent, opacity: 0.8 }} />
+              ))}
+            </div>
           </button>
         );
       })}

@@ -1,12 +1,11 @@
-// Page: Home
-import CrystalBackground from "../components/CrystalBackground";
+import CrystalBackground from '../components/CrystalBackground';
+
 function HomePage() {
   return (
-    <div>
-      <CrystalBackground/>
-  </div>
-    
+    <div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
+      <CrystalBackground />
+    </div>
   );
 }
 
-export default HomePage 
+export default HomePage;

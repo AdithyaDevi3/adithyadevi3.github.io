@@ -1,4 +1,4 @@
-export const portfolioEntries = [
+export const initialPortfolioEntries = [
   {
     id: 'ncr',
     name: 'NCR Voyix',
@@ -71,3 +71,90 @@ export const careerHighlights = [
   'Research-driven design and implementation',
   'Developer experience and polished interfaces'
 ];
+
+export const initialConnections = [
+  { id: 'conn-ncr-novae', fromId: 'ncr', toId: 'novae', color: '#4b7bff' },
+  { id: 'conn-novae-adobe', fromId: 'novae', toId: 'adobe', color: '#2ec4b6' },
+  { id: 'conn-adobe-research', fromId: 'adobe', toId: 'research', color: '#8b5cf6' }
+];
+
+export const defaultGalaxySettings = {
+  backgroundStars: 120,
+  nebulaCount: 3,
+  shootingStarFrequency: 0.6
+};
+
+export function createPortfolioEntry(overrides = {}) {
+  const id = `entry-${Math.random().toString(36).slice(2, 8)}`;
+  return {
+    id,
+    name: 'New Experience',
+    title: 'New role',
+    period: 'Present',
+    summary: 'Add a new company, project, or research milestone.',
+    technologies: ['New Tech'],
+    projects: [{ name: 'New Moon', summary: 'Describe the project or achievement.' }],
+    color: '#4b7bff',
+    orbitRadius: 7.2,
+    orbitSpeed: 0.16,
+    accent: '#73e0ff',
+    ...overrides
+  };
+}
+
+export function updatePortfolioEntry(entries, entryId, updates) {
+  return entries.map((entry) => (entry.id === entryId ? { ...entry, ...updates } : entry));
+}
+
+export function reorderPortfolioEntry(entries, entryId, direction) {
+  const index = entries.findIndex((entry) => entry.id === entryId);
+  if (index < 0) return entries;
+  const nextIndex = index + direction;
+  if (nextIndex < 0 || nextIndex >= entries.length) return entries;
+  const reordered = [...entries];
+  const [entry] = reordered.splice(index, 1);
+  reordered.splice(nextIndex, 0, entry);
+  return reordered;
+}
+
+export function removePortfolioEntry(entries, entryId) {
+  return entries.filter((entry) => entry.id !== entryId);
+}
+
+export function addProjectToEntry(entries, entryId, project) {
+  return entries.map((entry) => (entry.id === entryId ? { ...entry, projects: [...entry.projects, project] } : entry));
+}
+
+export function removeProject(entries, entryId, projectIndex) {
+  return entries.map((entry) => (entry.id === entryId ? { ...entry, projects: entry.projects.filter((_, index) => index !== projectIndex) } : entry));
+}
+
+export function updateProject(entries, entryId, projectIndex, updates) {
+  return entries.map((entry) => {
+    if (entry.id !== entryId) return entry;
+    return {
+      ...entry,
+      projects: entry.projects.map((project, index) => (index === projectIndex ? { ...project, ...updates } : project))
+    };
+  });
+}
+
+export function createConnection(overrides = {}) {
+  return {
+    id: `conn-${Math.random().toString(36).slice(2, 8)}`,
+    fromId: '',
+    toId: '',
+    color: '#4b7bff',
+    ...overrides
+  };
+}
+
+export function updateConnection(connections, connectionId, updates) {
+  return connections.map((connection) => (connection.id === connectionId ? { ...connection, ...updates } : connection));
+}
+
+export function removeConnection(connections, connectionId) {
+  return connections.filter((connection) => connection.id !== connectionId);
+}
+
+export const portfolioEntries = initialPortfolioEntries;
