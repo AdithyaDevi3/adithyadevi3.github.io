@@ -47,6 +47,24 @@ function CrystalBackground() {
     const starTexture = createStarTexture();
     const { atoms, edges } = createCrystalGeometry(structureGroup, starTexture);
 
+    // Initialize edge animation states
+    edges.forEach((edge, index) => {
+      edge.animationStartTime = null;
+      edge.animationDuration = 400 + Math.random() * 600; // 0.4-1s per edge (faster)
+      edge.spawnOffset = index * 25; // Faster stagger
+      edge.startPosition = new THREE.Vector3(
+        (Math.random() - 0.5) * 40,
+        (Math.random() - 0.5) * 30,
+        (Math.random() - 0.5) * 40 - 20
+      );
+      edge.endPosition = new THREE.Vector3(
+        (edge.atom1.position.x + edge.atom2.position.x) / 2,
+        (edge.atom1.position.y + edge.atom2.position.y) / 2,
+        (edge.atom1.position.z + edge.atom2.position.z) / 2
+      );
+      edge.line.material.opacity = 0;
+    });
+
     atoms.forEach((atom) => {
       atom.energy = 0;
       atom.energyPulse = 0;
@@ -57,7 +75,7 @@ function CrystalBackground() {
       edge.energyPulse = 0;
     });
 
-    const particleCount = 2200;
+    const particleCount = 4400;
     const particlePositions = new Float32Array(particleCount * 3);
     const particleColors = new Float32Array(particleCount * 3);
     const particleAlphas = new Float32Array(particleCount);
@@ -257,32 +275,13 @@ function CrystalBackground() {
     }
 
     function sampleSourcePoint(buildProgress) {
-      const mode = Math.random();
-      const edge = Math.floor(Math.random() * 4);
-      const margin = 1.16;
-
-      if (mode < 0.3) {
-        if (edge === 0) return screenToWorld(-margin + Math.random() * 2 * margin, -1 + Math.random() * 2, 0.8);
-        if (edge === 1) return screenToWorld(margin - Math.random() * 2 * margin, -1 + Math.random() * 2, 0.8);
-        if (edge === 2) return screenToWorld(-1 + Math.random() * 2, -margin + Math.random() * 2 * margin, 0.8);
-        return screenToWorld(-1 + Math.random() * 2, margin - Math.random() * 2 * margin, 0.8);
-      }
-
-      if (mode < 0.7) {
-        const offset = camera.position.clone();
-        offset.x += (Math.random() - 0.5) * 4.6;
-        offset.y += (Math.random() - 0.5) * 3.8;
-        offset.z += 4 + Math.random() * 6;
-        return offset;
-      }
-
-      const spread = 14 + Math.random() * 12;
-      const angle = Math.random() * Math.PI * 2;
-      const elevation = (Math.random() - 0.5) * Math.PI * 0.7;
-      const x = Math.cos(angle) * Math.cos(elevation) * spread;
-      const y = Math.sin(elevation) * spread * 0.85;
-      const z = Math.sin(angle) * Math.cos(elevation) * spread * 0.7;
-      return new THREE.Vector3(x, y, z).multiplyScalar(0.7 + buildProgress * 0.4);
+      // Particles start VISIBLE on screen at random positions (aerial transportation effect)
+      // They'll animate/fly toward crystal atoms/edges
+      const randX = (Math.random() - 0.5) * 1.8;  // Random X across viewport
+      const randY = (Math.random() - 0.5) * 1.6;  // Random Y across viewport
+      const randZ = 0.5 + Math.random() * 0.8;    // Depth variation for layering
+      
+      return screenToWorld(randX, randY, randZ);
     }
 
     function selectTarget(buildProgress) {
@@ -322,7 +321,7 @@ function CrystalBackground() {
       particle.progress = 0;
       particle.life = 0;
       particle.trailPosition.copy(start);
-      particle.duration = 0.9 + Math.random() * 0.5;
+      particle.duration = 1.4 + Math.random() * 0.8;
       particle.phase = Math.random() * Math.PI * 2;
       const particlePalette = [
         new THREE.Color('#1e4bda'),
@@ -335,12 +334,12 @@ function CrystalBackground() {
       ];
       particle.color.copy(particlePalette[Math.floor(Math.random() * particlePalette.length)]);
       particle.size = 0.018 + Math.random() * 0.015;
-      particle.alpha = 0.08 + Math.random() * 0.14;
+      particle.alpha = 0.12 + Math.random() * 0.18;
       particle.position = particle.start.clone();
     }
 
-    const buildDuration = 13000;
-    const buildTargetCount = 2000;
+    const buildDuration = 15000;
+    const buildTargetCount = 3500;
     let startTime = performance.now();
     let time = 0;
     let spawned = 0;
@@ -350,8 +349,8 @@ function CrystalBackground() {
       const elapsed = performance.now() - startTime;
       time += 0.016;
       const buildProgress = Math.min(1, spawned / buildTargetCount);
-      const densityCurve = 0.24 + 0.74 * (1 - Math.abs(buildProgress * 2 - 1));
-      const arrivalRate = (elapsed / buildDuration) * buildTargetCount * (0.42 + densityCurve * 1.1);
+      const densityCurve = 0.28 + 0.72 * (1 - Math.abs(buildProgress * 2 - 1));
+      const arrivalRate = (elapsed / buildDuration) * buildTargetCount * (0.45 + densityCurve * 1.15);
       const newSpawnCount = Math.max(0, Math.floor(arrivalRate) - spawned);
       for (let i = 0; i < newSpawnCount; i += 1) {
         if (spawned < buildTargetCount) {
@@ -420,85 +419,62 @@ function CrystalBackground() {
       });
 
       edges.forEach((edge, index) => {
-        const atom1Progress = edge.atom1.sprite.scale.x / edge.atom1.targetScale;
-        const atom2Progress = edge.atom2.sprite.scale.x / edge.atom2.targetScale;
-        const edgeProgress = Math.min(atom1Progress, atom2Progress);
+        const elapsedSinceStart = elapsed - edge.spawnOffset;
+        
+        if (elapsedSinceStart >= 0 && elapsedSinceStart < edge.animationDuration) {
+          // Edge is currently animating
+          const t = elapsedSinceStart / edge.animationDuration;
+          const eased = t * t * (3 - 2 * t); // Smooth easing
+          
+          // Animate the line endpoints from start to end
+          const startPos = edge.startPosition;
+          const endPos = edge.atom1.position;
+          const controlPos = edge.atom2.position;
+          
+          // Bezier curve interpolation
+          const p0 = startPos;
+          const p1 = controlPos;
+          const p2 = endPos;
+          
+          const newStart = new THREE.Vector3()
+            .copy(p0).multiplyScalar((1 - eased) * (1 - eased))
+            .addScaledVector(p1, 2 * (1 - eased) * eased)
+            .addScaledVector(p2, eased * eased);
+          
+          const newEnd = new THREE.Vector3()
+            .copy(p1).multiplyScalar((1 - eased) * (1 - eased))
+            .addScaledVector(p2, 2 * (1 - eased) * eased)
+            .addScaledVector(controlPos, eased * eased);
+          
+          const positions = edge.line.geometry.attributes.position.array;
+          positions[0] = newStart.x;
+          positions[1] = newStart.y;
+          positions[2] = newStart.z;
+          positions[3] = newEnd.x;
+          positions[4] = newEnd.y;
+          positions[5] = newEnd.z;
+          edge.line.geometry.attributes.position.needsUpdate = true;
+          
+          edge.line.material.opacity = eased * 0.8;
+        } else if (elapsedSinceStart >= edge.animationDuration) {
+          // Edge has arrived - snap to final position
+          const positions = edge.line.geometry.attributes.position.array;
+          positions[0] = edge.atom1.position.x;
+          positions[1] = edge.atom1.position.y;
+          positions[2] = edge.atom1.position.z;
+          positions[3] = edge.atom2.position.x;
+          positions[4] = edge.atom2.position.y;
+          positions[5] = edge.atom2.position.z;
+          edge.line.geometry.attributes.position.needsUpdate = true;
+          edge.line.material.opacity = 0.8;
+        }
+        
         const midpoint = new THREE.Vector3().lerpVectors(edge.atom1.position, edge.atom2.position, 0.5);
         edge.energy = Math.max(0, edge.energy - 0.015);
         edge.energyPulse = Math.max(0, edge.energyPulse - 0.03);
-        const color = getWaveColor(midpoint, edgeProgress, 1.2);
-        edge.line.material.opacity = Math.min(1, edgeProgress * edge.baseOpacity * (0.44 + glimmer * 0.34 + edge.energyPulse * 0.12));
+        const color = getWaveColor(midpoint, 1, 1.2);
         edge.line.material.color.setHSL(color.hue, color.saturation, color.lightness + edge.energyPulse * 0.05);
       });
-
-      for (let i = 0; i < particles.length; i += 1) {
-        const particle = particles[i];
-        if (!particle.active) continue;
-
-        particle.life += 0.016;
-        const eased = Math.min(1, particle.life / particle.duration);
-        const easedCurve = eased * eased * (3 - 2 * eased);
-        const point = new THREE.Vector3();
-        point.copy(particle.start).multiplyScalar(1 - easedCurve);
-        point.addScaledVector(particle.control, 2 * easedCurve * (1 - easedCurve));
-        point.addScaledVector(particle.target, easedCurve);
-        point.x += Math.sin(easedCurve * 7 + particle.phase) * 0.12;
-        point.y += Math.cos(easedCurve * 6.2 + particle.phase * 0.9) * 0.1;
-        point.z += Math.sin(easedCurve * 8 + particle.phase * 1.1) * 0.08;
-
-        const previousPoint = particle.position.clone();
-        particle.position.copy(point);
-        particle.progress = easedCurve;
-        particle.trailPosition.copy(previousPoint);
-
-        const particleIndex = i * 3;
-        particlePositions[particleIndex] = point.x;
-        particlePositions[particleIndex + 1] = point.y;
-        particlePositions[particleIndex + 2] = point.z;
-        const brightness = 0.72 + 0.28 * Math.sin(easedCurve * Math.PI + particle.phase);
-        particleColors[particleIndex] = particle.color.r * brightness;
-        particleColors[particleIndex + 1] = particle.color.g * brightness;
-        particleColors[particleIndex + 2] = particle.color.b * brightness;
-        particleAlphas[i] = particle.alpha * (1 - Math.max(0, easedCurve - 0.85) / 0.15);
-        particleSizes[i] = particle.size * (0.82 + 0.38 * Math.sin(time * 2.4 + particle.phase));
-
-        trailPositions[particleIndex] = particle.trailPosition.x;
-        trailPositions[particleIndex + 1] = particle.trailPosition.y;
-        trailPositions[particleIndex + 2] = particle.trailPosition.z;
-        trailColors[particleIndex] = particle.color.r * 0.55;
-        trailColors[particleIndex + 1] = particle.color.g * 0.55;
-        trailColors[particleIndex + 2] = particle.color.b * 0.55;
-        trailAlphas[i] = Math.max(0, particle.alpha * 0.34 * (1 - easedCurve));
-        trailSizes[i] = particle.size * 0.55;
-
-        if (easedCurve >= 0.96) {
-          atoms.forEach((atom) => {
-            if (atom.position.distanceTo(particle.target) < 0.55) {
-              atom.energy = Math.max(atom.energy, 1.1);
-              atom.energyPulse = 1;
-            }
-          });
-          edges.forEach((edge) => {
-            const midpoint = new THREE.Vector3().lerpVectors(edge.atom1.position, edge.atom2.position, 0.5);
-            if (midpoint.distanceTo(particle.target) < 0.62) {
-              edge.energy = Math.max(edge.energy, 0.85);
-              edge.energyPulse = 0.95;
-            }
-          });
-          particle.active = false;
-          trailAlphas[i] = 0;
-        }
-      }
-
-      particleGeometry.attributes.position.needsUpdate = true;
-      particleGeometry.attributes.color.needsUpdate = true;
-      particleGeometry.attributes.alpha.needsUpdate = true;
-      particleGeometry.attributes.size.needsUpdate = true;
-      trailGeometry.attributes.position.needsUpdate = true;
-      trailGeometry.attributes.color.needsUpdate = true;
-      trailGeometry.attributes.alpha.needsUpdate = true;
-      trailGeometry.attributes.size.needsUpdate = true;
-      particleMaterial.uniforms.uTime.value = time;
       trailMaterial.uniforms.uTime.value = time;
 
       renderer.render(scene, camera);
