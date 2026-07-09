@@ -2,35 +2,13 @@ import curoLogo from './assets/public/curo-logo.png'
 import novaeLogo from './assets/public/novae-logo.png'
 import ncrLogo from './assets/public/ncr-voyix-logo.png'
 import adobeLogo from './assets/public/adobe-logo.png'
-import resume from './assets/public/Adithya_Devi_Resume.pdf'
+
 // Page: About
 function AboutPage() {
   return (
     <div style={{minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', paddingTop: '20px', paddingBottom: '100px'}}>
       <div style={{maxWidth: '900px', background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', borderRadius: 16, padding: '40px'}}>
-        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32}}>
-          <h2 style={{fontSize: 40, fontWeight: 700, color: '#ffffff', margin: 0}}>About</h2>
-          <a 
-            href={resume} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            style={{
-              padding: '10px 16px',
-              background: 'rgba(7, 13, 14, 0.2)',
-              color: '#e6fbff',
-              borderRadius: 4,
-              textDecoration: 'none',
-              fontWeight: 600,
-              fontSize: 14,
-              cursor: 'pointer',
-              transition: 'all 0.2s'
-            }}
-            onMouseEnter={(e) => { e.target.style.background = 'rgba(102, 232, 255, 0.3)'; e.target.style.borderColor = 'rgba(102, 232, 255, 0.7)'; }}
-            onMouseLeave={(e) => { e.target.style.background = 'rgba(0, 2, 2, 0.2)'; e.target.style.borderColor = 'rgba(0, 0, 0, 0.4)'; }}
-          >
-            CV / Resume
-          </a>
-        </div>
+        
 
         {/* Experience Section */}
         <div style={{marginBottom: 40}}>
