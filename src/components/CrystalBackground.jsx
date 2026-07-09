@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import createCrystalGeometry from '../utils/crystalGeometry.js';
 import createStarTexture from '../utils/textureUtils.js';
+import { btn as btnStyle } from '../theme';
 
 function CrystalBackground() {
   const mountRef = useRef(null);
@@ -393,55 +394,104 @@ function CrystalBackground() {
       const glimmer = 0.45 + 0.55 * Math.sin(time * 0.4 + Math.PI * 0.5);
 
       const palette = [
-        { hue: 0.62, saturation: 0.95, lightness: 0.28 },  // Deep Sapphire Blue
-        { hue: 0.60, saturation: 0.90, lightness: 0.35 },  // Royal Blue
-        { hue: 0.68, saturation: 0.88, lightness: 0.32 },  // Indigo
-        { hue: 0.77, saturation: 0.85, lightness: 0.38 },  // Violet
-        { hue: 0.33, saturation: 0.92, lightness: 0.40 },  // Emerald Green
-        { hue: 0.50, saturation: 0.90, lightness: 0.36 },  // Teal
-        { hue: 0.52, saturation: 0.95, lightness: 0.38 }   // Cyan Highlights
+        { hue: 0.625, saturation: 0.90, lightness: 0.26 },  // Deep Sapphire Blue
+        { hue: 0.617, saturation: 0.88, lightness: 0.35 },  // Royal Blue
+        { hue: 0.597, saturation: 0.95, lightness: 0.44 },  // Electric Blue
+        { hue: 0.636, saturation: 0.85, lightness: 0.22 },  // Midnight Blue
+        { hue: 0.575, saturation: 0.80, lightness: 0.42 },  // Azure
+        { hue: 0.528, saturation: 0.90, lightness: 0.28 },  // Deep Cyan
+        { hue: 0.517, saturation: 0.95, lightness: 0.44 },  // Cyan Highlights
+        { hue: 0.500, saturation: 0.90, lightness: 0.40 },  // Aqua
+        { hue: 0.483, saturation: 0.88, lightness: 0.32 },  // Teal
+        { hue: 0.469, saturation: 0.82, lightness: 0.38 },  // Turquoise
+        { hue: 0.389, saturation: 0.92, lightness: 0.36 },  // Emerald Green
+        { hue: 0.406, saturation: 0.85, lightness: 0.30 },  // Jade Green
+        { hue: 0.361, saturation: 0.78, lightness: 0.27 },  // Forest Emerald
+        { hue: 0.375, saturation: 0.88, lightness: 0.32 },  // Deep Emerald
+        { hue: 0.417, saturation: 0.80, lightness: 0.38 },  // Mint Green
+        { hue: 0.347, saturation: 0.72, lightness: 0.30 },  // Hunter Green
+        { hue: 0.430, saturation: 0.75, lightness: 0.42 },  // Sea Green
+        { hue: 0.333, saturation: 0.85, lightness: 0.35 },  // Spring Emerald
+        { hue: 0.278, saturation: 0.70, lightness: 0.32 },  // Olive Green
+        { hue: 0.681, saturation: 0.88, lightness: 0.30 },  // Indigo
+        { hue: 0.736, saturation: 0.90, lightness: 0.25 },  // Deep Violet
+        { hue: 0.764, saturation: 0.88, lightness: 0.36 },  // Royal Purple
+        { hue: 0.778, saturation: 0.82, lightness: 0.40 },  // Amethyst
+        { hue: 0.833, saturation: 0.90, lightness: 0.36 },  // Magenta
+        { hue: 0.861, saturation: 0.92, lightness: 0.42 },  // Fuchsia Accents
+        { hue: 0.972, saturation: 0.88, lightness: 0.28 },  // Deep Crimson
+        { hue: 0.986, saturation: 0.85, lightness: 0.34 },  // Ruby
+        { hue: 0.911, saturation: 0.88, lightness: 0.44 },  // Plasma Pink
+        { hue: 0.556, saturation: 0.25, lightness: 0.75 },  // Arctic White (highlights)
+        { hue: 0.569, saturation: 0.45, lightness: 0.68 },  // Soft Ice Blue (highlights)
       ];
 
-      const getSpatialGradientColor = (position) => {
-        const cycleDuration = 4000; // 4 seconds for plane to sweep across (in milliseconds)
-        const waveProgress = (elapsed % cycleDuration) / cycleDuration; // 0-1 using elapsed time
-        
-        // Get current and next color indices based on real elapsed time
+      const cycleDuration = 8000;         // ms per color step
+      const glistenInterval = 10 * cycleDuration; // every 10 color steps (~80s)
+      const glistenDuration = 4500;       // 4.5s glisten window
+      const blockPosition = elapsed % glistenInterval;
+      const inGlisten = blockPosition > (glistenInterval - glistenDuration);
+      const rawGlistenT = inGlisten
+        ? (blockPosition - (glistenInterval - glistenDuration)) / glistenDuration
+        : 0;
+      // Smooth fade in (first 15%) and fade out (last 15%)
+      const glistenFade = rawGlistenT < 0.15
+        ? rawGlistenT / 0.15
+        : rawGlistenT > 0.85
+          ? (1 - rawGlistenT) / 0.15
+          : 1;
+
+      const getSpatialGradientColor = (position, atomIndex = 0) => {
+        const waveProgress = (elapsed % cycleDuration) / cycleDuration;
+
         const colorIndex = Math.floor(elapsed / cycleDuration) % palette.length;
         const currentColor = palette[colorIndex];
         const nextColor = palette[(colorIndex + 1) % palette.length];
-        
-        // Calculate spatial position relative to wave front
-        // Wave sweeps along a diagonal plane: combines x, y, z to create smooth sweep
+
         const spatialComponent = (position.x * 0.4 + position.y * 0.3 + position.z * 0.3);
-        
-        // Wave front position ranges from -30 to +30 (crystal spans roughly that range)
         const waveRange = 60;
         const wavePosition = -30 + waveProgress * waveRange;
-        
-        // Transition zone for smooth interpolation at the wave front
-        const transitionWidth = 3;
+
+        const transitionWidth = 12;
         const distance = spatialComponent - wavePosition;
-        
-        // Once past the wave front, use the next color; otherwise use current color
         let colorTransition = Math.max(0, Math.min(1, (distance + transitionWidth) / (transitionWidth * 2)));
-        
-        // Interpolate hue taking the shorter path around the color wheel
+        colorTransition = colorTransition * colorTransition * (3 - 2 * colorTransition);
+
         let hue1 = currentColor.hue;
         let hue2 = nextColor.hue;
-        
-        // Check if going backwards is shorter
-        if (hue2 < hue1 && (hue1 - hue2) > 0.5) {
-          hue2 += 1; // Go the other way around
-        } else if (hue2 > hue1 && (hue2 - hue1) > 0.5) {
-          hue1 += 1; // Go the other way around
-        }
-        
+        if (hue2 < hue1 && (hue1 - hue2) > 0.5) hue2 += 1;
+        else if (hue2 > hue1 && (hue2 - hue1) > 0.5) hue1 += 1;
+
         const hue = (hue1 * (1 - colorTransition) + hue2 * colorTransition) % 1;
-        const saturation = Math.max(0.5, currentColor.saturation * (1 - colorTransition) + nextColor.saturation * colorTransition);
-        const lightness = Math.max(0.25, Math.min(0.45, currentColor.lightness * (1 - colorTransition) + nextColor.lightness * colorTransition));
-        
-        return { hue, saturation, lightness };
+        const saturation = Math.max(0.2, currentColor.saturation * (1 - colorTransition) + nextColor.saturation * colorTransition);
+        const lightness = Math.max(0.20, Math.min(0.78, currentColor.lightness * (1 - colorTransition) + nextColor.lightness * colorTransition));
+        const normalColor = { hue, saturation, lightness };
+
+        if (!inGlisten || glistenFade === 0) return normalColor;
+
+        // Glisten: each atom cycles the full palette rapidly at its own phase offset
+        const glistenSpeed = 10;
+        const phaseShift = atomIndex * 0.09; // stagger atoms so no two are the same color
+        const gElapsed = elapsed * glistenSpeed + phaseShift * cycleDuration;
+        const gIdx = Math.floor(gElapsed / cycleDuration) % palette.length;
+        const gProg = (gElapsed % cycleDuration) / cycleDuration;
+        const gCur = palette[gIdx];
+        const gNxt = palette[(gIdx + 1) % palette.length];
+
+        let gh1 = gCur.hue, gh2 = gNxt.hue;
+        if (gh2 < gh1 && gh1 - gh2 > 0.5) gh2 += 1;
+        else if (gh2 > gh1 && gh2 - gh1 > 0.5) gh1 += 1;
+
+        const gHue = (gh1 * (1 - gProg) + gh2 * gProg) % 1;
+        const gSat = Math.max(0.7, gCur.saturation * (1 - gProg) + gNxt.saturation * gProg);
+        const gLight = Math.min(0.72, (gCur.lightness * (1 - gProg) + gNxt.lightness * gProg) + 0.15);
+
+        // Blend normal → glisten by glistenFade
+        return {
+          hue: (normalColor.hue * (1 - glistenFade) + gHue * glistenFade + 1) % 1,
+          saturation: normalColor.saturation * (1 - glistenFade) + gSat * glistenFade,
+          lightness: normalColor.lightness * (1 - glistenFade) + gLight * glistenFade,
+        };
       };
 
       atoms.forEach((atom, index) => {
@@ -452,8 +502,9 @@ function CrystalBackground() {
         atom.energy = Math.max(0, atom.energy - 0.018);
         atom.energyPulse = Math.max(0, atom.energyPulse - 0.035);
 
-        const color = getSpatialGradientColor(atom.position);
-        atom.sprite.material.opacity = atomProgress * (0.38 + glimmer * 0.34 + atom.energyPulse * 0.16 + 0.06 * Math.sin(time * 0.8 + index * 0.08)) * 0.96;
+        const color = getSpatialGradientColor(atom.position, index);
+        const opacityBoost = inGlisten ? 1 + glistenFade * 0.4 : 1; // brighter during glisten
+        atom.sprite.material.opacity = atomProgress * (0.38 + glimmer * 0.34 + atom.energyPulse * 0.16 + 0.06 * Math.sin(time * 0.8 + index * 0.08)) * 0.96 * opacityBoost;
         atom.sprite.material.color.setHSL(color.hue, color.saturation, color.lightness + atom.energyPulse * 0.06);
       });
 
@@ -511,7 +562,7 @@ function CrystalBackground() {
         const midpoint = new THREE.Vector3().lerpVectors(edge.atom1.position, edge.atom2.position, 0.5);
         edge.energy = Math.max(0, edge.energy - 0.015);
         edge.energyPulse = Math.max(0, edge.energyPulse - 0.03);
-        const color = getSpatialGradientColor(midpoint);
+        const color = getSpatialGradientColor(midpoint, index);
         edge.line.material.color.setHSL(color.hue, color.saturation, color.lightness + edge.energyPulse * 0.05);
       });
       trailMaterial.uniforms.uTime.value = time;
@@ -562,9 +613,18 @@ function CrystalBackground() {
           setIsFastForward(!isFastForward);
           speedMultiplierRef.current = isFastForward ? 0.5 : 10;
         }}
-        className="fixed bottom-8 right-8 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-lg transition-colors z-50"
+        style={{
+          ...btnStyle.base,
+          position: 'fixed',
+          bottom: 24,
+          left: 24,
+          zIndex: 50,
+          ...(isFastForward ? btnStyle.active : btnStyle.inactive),
+        }}
+        onMouseEnter={(e) => btnStyle.hoverEnter(e.currentTarget)}
+        onMouseLeave={(e) => Object.assign(e.currentTarget.style, isFastForward ? btnStyle.active : btnStyle.inactive)}
       >
-        {isFastForward ? '⏸ Normal' : '⏩ 20x Fast Forward'}
+        {isFastForward ? '🐢 Normal Speed' : 'Speed Up'}
       </button>
     </>
   );

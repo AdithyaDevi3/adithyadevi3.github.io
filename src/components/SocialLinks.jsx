@@ -1,40 +1,42 @@
 import { FaLinkedin, FaGithub, FaEnvelope } from "react-icons/fa";
+import { colors, layout } from '../theme';
+
+const linkStyle = {
+  color: '#ffffff',
+  padding: '8px 12px',
+  borderRadius: 10,
+  background: colors.bgSocial,
+  border: `1px solid ${colors.accentBorder}`,
+  transition: 'all 0.2s',
+  cursor: 'pointer',
+  display: 'flex',
+  alignItems: 'center',
+};
+
+const socialLinks = [
+  { href: 'https://github.com/AdithyaDevi3', icon: FaGithub, label: 'GitHub', target: '_blank' },
+  { href: 'https://www.linkedin.com/in/adithya-devi', icon: FaLinkedin, label: 'LinkedIn', target: '_blank' },
+  { href: 'mailto:adithya.r.devi02@gmail.com', icon: FaEnvelope, label: 'Email', target: undefined },
+];
 
 function SocialLinks() {
   return (
-    <div style={{position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)', zIndex: 60, display: 'flex', gap: 12, pointerEvents: 'auto'}}>
-      <a
-        href="https://github.com/AdithyaDevi3"
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{color: '#ffffff', padding: '8px 12px', borderRadius: 10, background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(102, 232, 255, 0.15)', transition: 'all 0.2s', cursor: 'pointer'}}
-        onMouseEnter={(e) => e.target.style.background = 'rgba(0,0,0,0.7)'}
-        onMouseLeave={(e) => e.target.style.background = 'rgba(0,0,0,0.4)'}
-      >
-        <FaGithub size={26}/>
-      </a>
-
-      <a
-        href="https://www.linkedin.com/in/adithya-devi"
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{color: '#ffffff', padding: '8px 12px', borderRadius: 10, background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(102, 232, 255, 0.15)', transition: 'all 0.2s', cursor: 'pointer'}}
-        onMouseEnter={(e) => e.target.style.background = 'rgba(0,0,0,0.7)'}
-        onMouseLeave={(e) => e.target.style.background = 'rgba(0,0,0,0.4)'}
-      >
-        <FaLinkedin size={26} />
-      </a>
-
-      <a
-        href="mailto:adithya.r.devi02@gmail.com"
-        style={{color: '#ffffff', padding: '8px 12px', borderRadius: 10, background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(102, 232, 255, 0.15)', transition: 'all 0.2s', cursor: 'pointer'}}
-        onMouseEnter={(e) => e.target.style.background = 'rgba(0,0,0,0.7)'}
-        onMouseLeave={(e) => e.target.style.background = 'rgba(0,0,0,0.4)'}
-      >
-        <FaEnvelope size={26}/>
-      </a>
+    <div style={{ position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)', zIndex: layout.zOverlay, display: 'flex', gap: 12, pointerEvents: 'auto' }}>
+      {socialLinks.map(({ href, icon: Icon, label, target }) => (
+        <a
+          key={label}
+          href={href}
+          target={target}
+          rel={target ? 'noopener noreferrer' : undefined}
+          style={linkStyle}
+          onMouseEnter={(e) => e.currentTarget.style.background = colors.bgSocialHover}
+          onMouseLeave={(e) => e.currentTarget.style.background = colors.bgSocial}
+        >
+          <Icon size={26} />
+        </a>
+      ))}
     </div>
   );
 }
 
-export default SocialLinks
+export default SocialLinks;

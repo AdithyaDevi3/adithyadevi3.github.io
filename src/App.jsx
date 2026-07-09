@@ -10,12 +10,10 @@ import HomePage from "./pages/HomePage";
 export default function App() {
   const [route, setRoute] = useState('home');
   return (
-    <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden' }}>
-      {/* Canvas background - must be rendered first */}
+    <div style={{ position: 'relative', width: '100%', minHeight: '100vh', background: '#020611' }}>
       {route === 'home' && <HomePage />}
       {route === 'about' && <AboutPage />}
 
-      {/* UI Overlay */}
       {route === 'home' && <Header />}
       <Navigation route={route} setRoute={setRoute} />
       <SocialLinks />

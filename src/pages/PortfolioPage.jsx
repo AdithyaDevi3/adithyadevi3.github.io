@@ -31,20 +31,20 @@ function PortfolioPage() {
         color: '#e0f2fe'
       }}>
         <h3 style={{ margin: '0 0 8px 0', fontSize: 18, fontWeight: 700, color: '#66e8ff' }}>
-          {selectedEntry.name}
+          🚀 {selectedEntry.name}
         </h3>
         <p style={{ margin: '0 0 4px 0', fontSize: 14, color: '#a8e6fc', fontWeight: 600 }}>
-          {selectedEntry.title}
+          💼 {selectedEntry.title}
         </p>
         <p style={{ margin: '0 0 16px 0', fontSize: 12, color: '#7bb8d9' }}>
-          {selectedEntry.period}
+          📅 {selectedEntry.period}
         </p>
         <p style={{ margin: '0 0 12px 0', fontSize: 13, lineHeight: 1.6, color: '#cbd5e1' }}>
           {selectedEntry.summary}
         </p>
         <div style={{ marginBottom: 12 }}>
           <p style={{ margin: '0 0 6px 0', fontSize: 11, fontWeight: 600, color: '#66e8ff', textTransform: 'uppercase', letterSpacing: 0.5 }}>
-            Technologies
+            🛠️ Technologies
           </p>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {selectedEntry.technologies.map(tech => (
@@ -69,7 +69,7 @@ function PortfolioPage() {
         {selectedEntry.projects && selectedEntry.projects.length > 0 && (
           <div>
             <p style={{ margin: '0 0 6px 0', fontSize: 11, fontWeight: 600, color: '#66e8ff', textTransform: 'uppercase', letterSpacing: 0.5 }}>
-              Key Projects
+              ✨ Key Projects
             </p>
             {selectedEntry.projects.map(project => (
               <div key={project.name} style={{ marginBottom: 8, fontSize: 12, color: '#cbd5e1' }}>
