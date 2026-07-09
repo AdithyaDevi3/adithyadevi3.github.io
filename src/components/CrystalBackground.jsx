@@ -8,6 +8,11 @@ function CrystalBackground() {
   const mountRef = useRef(null);
   const [isFastForward, setIsFastForward] = useState(false);
   const speedMultiplierRef = useRef(0.5);
+  const [buildComplete, setBuildComplete] = useState(false);
+  const buildCompleteRef = useRef(false);
+  const [glimmerActive, setGlimmerActive] = useState(false);
+  const glimmerActiveRef = useRef(false);
+  const glimmerBtnRef = useRef(null);
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -426,20 +431,48 @@ function CrystalBackground() {
         { hue: 0.569, saturation: 0.45, lightness: 0.68 },  // Soft Ice Blue (highlights)
       ];
 
-      const cycleDuration = 8000;         // ms per color step
-      const glistenInterval = 10 * cycleDuration; // every 10 color steps (~80s)
-      const glistenDuration = 4500;       // 4.5s glisten window
+      // Mark crystal build complete
+      if (!buildCompleteRef.current && elapsed >= 15000) {
+        buildCompleteRef.current = true;
+        setBuildComplete(true);
+      }
+
+      const cycleDuration = 2000;          // 2s per color step
+      const glistenInterval = 20000;        // glisten every 20s
+      const glistenDuration = 4500;
       const blockPosition = elapsed % glistenInterval;
-      const inGlisten = blockPosition > (glistenInterval - glistenDuration);
-      const rawGlistenT = inGlisten
+      const forceGlisten = glimmerActiveRef.current;
+      const inGlisten = forceGlisten || blockPosition > (glistenInterval - glistenDuration);
+      const rawGlistenT = forceGlisten ? 1 : (inGlisten
         ? (blockPosition - (glistenInterval - glistenDuration)) / glistenDuration
-        : 0;
-      // Smooth fade in (first 15%) and fade out (last 15%)
-      const glistenFade = rawGlistenT < 0.15
+        : 0);
+      const glistenFade = forceGlisten ? 1 : (rawGlistenT < 0.15
         ? rawGlistenT / 0.15
         : rawGlistenT > 0.85
           ? (1 - rawGlistenT) / 0.15
-          : 1;
+          : 1);
+
+      // Update glimmer button color from animation loop
+      if (glimmerBtnRef.current && buildCompleteRef.current) {
+        const btnSpeed = forceGlisten ? 0.5 : 0.07;
+        const btnElapsed = elapsed * btnSpeed;
+        const btnIdx = Math.floor(btnElapsed / cycleDuration) % palette.length;
+        const btnProg = (btnElapsed % cycleDuration) / cycleDuration;
+        const bCur = palette[btnIdx], bNxt = palette[(btnIdx + 1) % palette.length];
+        let bh1 = bCur.hue, bh2 = bNxt.hue;
+        if (bh2 < bh1 && bh1 - bh2 > 0.5) bh2 += 1;
+        else if (bh2 > bh1 && bh2 - bh1 > 0.5) bh1 += 1;
+        const btnHue = ((bh1 * (1 - btnProg) + bh2 * btnProg) % 1) * 360;
+        const btnL = forceGlisten ? 60 : 50;
+        const btnS = forceGlisten ? 95 : 78;
+        const glow = forceGlisten ? 8 + 5 * Math.sin(elapsed / 250) : 4 + 2 * Math.sin(elapsed / 700);
+        const btnColor = `hsl(${btnHue.toFixed(0)}, ${btnS}%, ${btnL}%)`;
+        const btnColorDim = `hsl(${btnHue.toFixed(0)}, ${btnS - 20}%, ${btnL - 15}%)`;
+        glimmerBtnRef.current.style.color = btnColor;
+        glimmerBtnRef.current.style.borderColor = btnColorDim;
+        glimmerBtnRef.current.style.boxShadow = `0 0 ${glow.toFixed(1)}px ${btnColor}`;
+        glimmerBtnRef.current.style.background = `rgba(${Math.round(btnHue/360*15)}, ${Math.round(12 + btnHue/360*8)}, 28, 0.75)`;
+      }
 
       const getSpatialGradientColor = (position, atomIndex = 0) => {
         const waveProgress = (elapsed % cycleDuration) / cycleDuration;
@@ -608,24 +641,58 @@ function CrystalBackground() {
   return (
     <>
       <div ref={mountRef} className="fixed inset-0 w-full h-full pointer-events-auto" />
-      <button
-        onClick={() => {
-          setIsFastForward(!isFastForward);
-          speedMultiplierRef.current = isFastForward ? 0.5 : 10;
-        }}
-        style={{
-          ...btnStyle.base,
-          position: 'fixed',
-          bottom: 24,
-          left: 24,
-          zIndex: 50,
-          ...(isFastForward ? btnStyle.active : btnStyle.inactive),
-        }}
-        onMouseEnter={(e) => btnStyle.hoverEnter(e.currentTarget)}
-        onMouseLeave={(e) => Object.assign(e.currentTarget.style, isFastForward ? btnStyle.active : btnStyle.inactive)}
-      >
-        {isFastForward ? '🐢 Normal Speed' : 'Speed Up'}
-      </button>
+
+      {/* Fast forward — only during crystal build */}
+      {!buildComplete && (
+        <button
+          onClick={() => {
+            setIsFastForward(!isFastForward);
+            speedMultiplierRef.current = isFastForward ? 0.5 : 10;
+          }}
+          style={{
+            ...btnStyle.base,
+            position: 'fixed',
+            bottom: 24,
+            left: 24,
+            zIndex: 50,
+            ...(isFastForward ? btnStyle.active : btnStyle.inactive),
+          }}
+          onMouseEnter={(e) => btnStyle.hoverEnter(e.currentTarget)}
+          onMouseLeave={(e) => Object.assign(e.currentTarget.style, isFastForward ? btnStyle.active : btnStyle.inactive)}
+        >
+          {isFastForward ? '🐢 Normal Speed' : 'Speed Up'}
+        </button>
+      )}
+
+      {/* Glimmer — appears after crystal is fully built */}
+      {buildComplete && (
+        <button
+          ref={glimmerBtnRef}
+          onClick={() => {
+            const next = !glimmerActive;
+            setGlimmerActive(next);
+            glimmerActiveRef.current = next;
+          }}
+          style={{
+            position: 'fixed',
+            bottom: 24,
+            left: 24,
+            padding: '8px 16px',
+            borderRadius: 6,
+            fontFamily: 'monospace',
+            fontWeight: 700,
+            fontSize: 12,
+            letterSpacing: '0.06em',
+            cursor: 'pointer',
+            border: '1px solid',
+            backdropFilter: 'blur(8px)',
+            zIndex: 50,
+            transition: 'box-shadow 0.1s',
+          }}
+        >
+          {glimmerActive ? '✦ Glimmering' : '✦ Glimmer'}
+        </button>
+      )}
     </>
   );
 }
