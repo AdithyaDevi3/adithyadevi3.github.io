@@ -1,10 +1,12 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import createCrystalGeometry from '../utils/crystalGeometry.js';
 import createStarTexture from '../utils/textureUtils.js';
 
 function CrystalBackground() {
   const mountRef = useRef(null);
+  const [isFastForward, setIsFastForward] = useState(false);
+  const speedMultiplierRef = useRef(4);
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -47,11 +49,25 @@ function CrystalBackground() {
     const starTexture = createStarTexture();
     const { atoms, edges } = createCrystalGeometry(structureGroup, starTexture);
 
-    // Initialize edge animation states
+    // Initialize edge animation states with two-phase timing
     edges.forEach((edge, index) => {
-      edge.animationStartTime = null;
-      edge.animationDuration = 400 + Math.random() * 600; // 0.4-1s per edge (faster)
-      edge.spawnOffset = index * 25; // Faster stagger
+      let spawnOffset, duration;
+      
+      if (index < 20) {
+        // First 20 edges: arrive by 10 seconds (slow, dramatic)
+        const arrivalTime = (index / 20) * 10000;
+        duration = 400 + Math.random() * 400; // 400-800ms
+        spawnOffset = Math.max(0, arrivalTime - duration);
+      } else {
+        // Last 10 edges: arrive by 15 seconds (fast, subtle)
+        const progressInSecondBatch = (index - 20) / 10;
+        const arrivalTime = 10000 + progressInSecondBatch * 5000;
+        duration = 200 + Math.random() * 300; // 200-500ms
+        spawnOffset = Math.max(0, arrivalTime - duration);
+      }
+      
+      edge.animationDuration = duration;
+      edge.spawnOffset = spawnOffset;
       edge.startPosition = new THREE.Vector3(
         (Math.random() - 0.5) * 40,
         (Math.random() - 0.5) * 30,
@@ -346,7 +362,7 @@ function CrystalBackground() {
 
     function animate() {
       requestAnimationFrame(animate);
-      const elapsed = performance.now() - startTime;
+      const elapsed = (performance.now() - startTime) * speedMultiplierRef.current;
       time += 0.016;
       const buildProgress = Math.min(1, spawned / buildTargetCount);
       const densityCurve = 0.28 + 0.72 * (1 - Math.abs(buildProgress * 2 - 1));
@@ -377,31 +393,33 @@ function CrystalBackground() {
       const glimmer = 0.45 + 0.55 * Math.sin(time * 0.4 + Math.PI * 0.5);
 
       const palette = [
-        { hue: 0.58, saturation: 0.9, lightness: 0.2 },
-        { hue: 0.64, saturation: 0.88, lightness: 0.22 },
-        { hue: 0.72, saturation: 0.84, lightness: 0.22 },
-        { hue: 0.8, saturation: 0.8, lightness: 0.24 },
-        { hue: 0.46, saturation: 0.74, lightness: 0.25 },
-        { hue: 0.5, saturation: 0.84, lightness: 0.26 },
-        { hue: 0.56, saturation: 0.86, lightness: 0.28 }
+        { hue: 0.58, saturation: 0.92, lightness: 0.22 },
+        { hue: 0.62, saturation: 0.90, lightness: 0.24 },
+        { hue: 0.66, saturation: 0.88, lightness: 0.26 },
+        { hue: 0.70, saturation: 0.86, lightness: 0.25 },
+        { hue: 0.74, saturation: 0.84, lightness: 0.27 },
+        { hue: 0.46, saturation: 0.76, lightness: 0.28 },
+        { hue: 0.50, saturation: 0.86, lightness: 0.29 },
+        { hue: 0.54, saturation: 0.88, lightness: 0.30 },
+        { hue: 0.08, saturation: 0.80, lightness: 0.26 },
+        { hue: 0.15, saturation: 0.78, lightness: 0.28 }
       ];
 
       const getWaveColor = (position, progress, phaseOffset = 0) => {
-        const axisA = new THREE.Vector3(0.72, -0.3, 0.64).normalize();
-        const axisB = new THREE.Vector3(-0.34, 0.8, 0.5).normalize();
-        const travelA = ((position.dot(axisA) * 0.35 + time * 0.26 + phaseOffset) % 1 + 1) % 1;
-        const travelB = ((position.dot(axisB) * 0.32 + time * 0.2 + phaseOffset + 0.22) % 1 + 1) % 1;
-        const bandA = 0.5 + 0.5 * Math.sin((travelA - 0.5) * Math.PI * 2);
-        const bandB = 0.5 + 0.5 * Math.sin((travelB - 0.5) * Math.PI * 2);
-        const wave = Math.max(0.2, Math.min(0.95, 0.35 + bandA * 0.35 + bandB * 0.25));
-        const paletteIndex = Math.floor((travelA * palette.length + travelB * 0.35) % palette.length);
-        const nextIndex = (paletteIndex + 1) % palette.length;
-        const mix = ((travelA * palette.length + travelB * 0.35) % 1 + 1) % 1;
-        const base = palette[paletteIndex];
+        // Entire crystal is one color, transitioning smoothly through palette over time
+        const buildDuration = 15000;
+        const colorProgress = (time / buildDuration) * palette.length;
+        const colorIndex = Math.floor(colorProgress) % palette.length;
+        const nextIndex = (colorIndex + 1) % palette.length;
+        const mix = colorProgress % 1; // 0-1 interpolation between colors
+        
+        const base = palette[colorIndex];
         const next = palette[nextIndex];
-        const hue = (base.hue * (1 - mix) + next.hue * mix + progress * 0.01) % 1;
-        const saturation = Math.min(1, base.saturation * 0.8 + next.saturation * 0.2 + wave * 0.08 + progress * 0.04);
-        const lightness = Math.min(0.9, base.lightness * (0.8 + progress * 0.16) + wave * 0.04 + (glimmer - 0.45) * 0.06);
+        
+        const hue = (base.hue * (1 - mix) + next.hue * mix) % 1;
+        const saturation = base.saturation * (1 - mix) + next.saturation * mix;
+        const lightness = base.lightness * (1 - mix) + next.lightness * mix;
+        
         return { hue, saturation, lightness };
       };
 
@@ -515,7 +533,20 @@ function CrystalBackground() {
     };
   }, []);
 
-  return <div ref={mountRef} className="fixed inset-0 w-full h-full pointer-events-auto" />;
+  return (
+    <>
+      <div ref={mountRef} className="fixed inset-0 w-full h-full pointer-events-auto" />
+      <button
+        onClick={() => {
+          setIsFastForward(!isFastForward);
+          speedMultiplierRef.current = isFastForward ? 4 : 80;
+        }}
+        className="fixed bottom-8 right-8 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-lg transition-colors z-50"
+      >
+        {isFastForward ? '⏸ Normal' : '⏩ 20x Fast Forward'}
+      </button>
+    </>
+  );
 }
 
 export default CrystalBackground;
