@@ -4,25 +4,21 @@ import { useState } from "react";
 import Header from "./components/Header";
 import SocialLinks from "./components/SocialLinks";
 import Navigation from "./components/Navigation";
-import ContactPage from "./pages/ContactPage";
 import AboutPage from "./pages/AboutPage";
 import HomePage from "./pages/HomePage";
-import TestPage from "./pages/TestPage";
+
 export default function App() {
   const [route, setRoute] = useState('home');
   return (
-    <div >
+    <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden' }}>
+      {/* Canvas background - must be rendered first */}
+      {route === 'home' && <HomePage />}
+      {route === 'about' && <AboutPage />}
 
+      {/* UI Overlay */}
       {route === 'home' && <Header />}
       <Navigation route={route} setRoute={setRoute} />
       <SocialLinks />
-  
-      <div className="relative z-10 h-full pointer-events-auto">
-        {route === 'home' && <HomePage />}
-        {route === 'about' && <AboutPage />}
-        {route === 'contact' && <ContactPage /> }
-        {route === 'test' && <TestPage /> }
-      </div>
     </div>
   );
 }

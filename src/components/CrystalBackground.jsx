@@ -6,7 +6,7 @@ import createStarTexture from '../utils/textureUtils.js';
 function CrystalBackground() {
   const mountRef = useRef(null);
   const [isFastForward, setIsFastForward] = useState(false);
-  const speedMultiplierRef = useRef(4);
+  const speedMultiplierRef = useRef(0.5);
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -393,32 +393,53 @@ function CrystalBackground() {
       const glimmer = 0.45 + 0.55 * Math.sin(time * 0.4 + Math.PI * 0.5);
 
       const palette = [
-        { hue: 0.58, saturation: 0.92, lightness: 0.22 },
-        { hue: 0.62, saturation: 0.90, lightness: 0.24 },
-        { hue: 0.66, saturation: 0.88, lightness: 0.26 },
-        { hue: 0.70, saturation: 0.86, lightness: 0.25 },
-        { hue: 0.74, saturation: 0.84, lightness: 0.27 },
-        { hue: 0.46, saturation: 0.76, lightness: 0.28 },
-        { hue: 0.50, saturation: 0.86, lightness: 0.29 },
-        { hue: 0.54, saturation: 0.88, lightness: 0.30 },
-        { hue: 0.08, saturation: 0.80, lightness: 0.26 },
-        { hue: 0.15, saturation: 0.78, lightness: 0.28 }
+        { hue: 0.62, saturation: 0.95, lightness: 0.28 },  // Deep Sapphire Blue
+        { hue: 0.60, saturation: 0.90, lightness: 0.35 },  // Royal Blue
+        { hue: 0.68, saturation: 0.88, lightness: 0.32 },  // Indigo
+        { hue: 0.77, saturation: 0.85, lightness: 0.38 },  // Violet
+        { hue: 0.33, saturation: 0.92, lightness: 0.40 },  // Emerald Green
+        { hue: 0.50, saturation: 0.90, lightness: 0.36 },  // Teal
+        { hue: 0.52, saturation: 0.95, lightness: 0.38 }   // Cyan Highlights
       ];
 
-      const getWaveColor = (position, progress, phaseOffset = 0) => {
-        // Entire crystal is one color, transitioning smoothly through palette over time
-        const buildDuration = 15000;
-        const colorProgress = (time / buildDuration) * palette.length;
-        const colorIndex = Math.floor(colorProgress) % palette.length;
-        const nextIndex = (colorIndex + 1) % palette.length;
-        const mix = colorProgress % 1; // 0-1 interpolation between colors
+      const getSpatialGradientColor = (position) => {
+        const cycleDuration = 4000; // 4 seconds for plane to sweep across (in milliseconds)
+        const waveProgress = (elapsed % cycleDuration) / cycleDuration; // 0-1 using elapsed time
         
-        const base = palette[colorIndex];
-        const next = palette[nextIndex];
+        // Get current and next color indices based on real elapsed time
+        const colorIndex = Math.floor(elapsed / cycleDuration) % palette.length;
+        const currentColor = palette[colorIndex];
+        const nextColor = palette[(colorIndex + 1) % palette.length];
         
-        const hue = (base.hue * (1 - mix) + next.hue * mix) % 1;
-        const saturation = base.saturation * (1 - mix) + next.saturation * mix;
-        const lightness = base.lightness * (1 - mix) + next.lightness * mix;
+        // Calculate spatial position relative to wave front
+        // Wave sweeps along a diagonal plane: combines x, y, z to create smooth sweep
+        const spatialComponent = (position.x * 0.4 + position.y * 0.3 + position.z * 0.3);
+        
+        // Wave front position ranges from -30 to +30 (crystal spans roughly that range)
+        const waveRange = 60;
+        const wavePosition = -30 + waveProgress * waveRange;
+        
+        // Transition zone for smooth interpolation at the wave front
+        const transitionWidth = 3;
+        const distance = spatialComponent - wavePosition;
+        
+        // Once past the wave front, use the next color; otherwise use current color
+        let colorTransition = Math.max(0, Math.min(1, (distance + transitionWidth) / (transitionWidth * 2)));
+        
+        // Interpolate hue taking the shorter path around the color wheel
+        let hue1 = currentColor.hue;
+        let hue2 = nextColor.hue;
+        
+        // Check if going backwards is shorter
+        if (hue2 < hue1 && (hue1 - hue2) > 0.5) {
+          hue2 += 1; // Go the other way around
+        } else if (hue2 > hue1 && (hue2 - hue1) > 0.5) {
+          hue1 += 1; // Go the other way around
+        }
+        
+        const hue = (hue1 * (1 - colorTransition) + hue2 * colorTransition) % 1;
+        const saturation = Math.max(0.5, currentColor.saturation * (1 - colorTransition) + nextColor.saturation * colorTransition);
+        const lightness = Math.max(0.25, Math.min(0.45, currentColor.lightness * (1 - colorTransition) + nextColor.lightness * colorTransition));
         
         return { hue, saturation, lightness };
       };
@@ -431,7 +452,7 @@ function CrystalBackground() {
         atom.energy = Math.max(0, atom.energy - 0.018);
         atom.energyPulse = Math.max(0, atom.energyPulse - 0.035);
 
-        const color = getWaveColor(atom.position, atomProgress, 0.2);
+        const color = getSpatialGradientColor(atom.position);
         atom.sprite.material.opacity = atomProgress * (0.38 + glimmer * 0.34 + atom.energyPulse * 0.16 + 0.06 * Math.sin(time * 0.8 + index * 0.08)) * 0.96;
         atom.sprite.material.color.setHSL(color.hue, color.saturation, color.lightness + atom.energyPulse * 0.06);
       });
@@ -490,7 +511,7 @@ function CrystalBackground() {
         const midpoint = new THREE.Vector3().lerpVectors(edge.atom1.position, edge.atom2.position, 0.5);
         edge.energy = Math.max(0, edge.energy - 0.015);
         edge.energyPulse = Math.max(0, edge.energyPulse - 0.03);
-        const color = getWaveColor(midpoint, 1, 1.2);
+        const color = getSpatialGradientColor(midpoint);
         edge.line.material.color.setHSL(color.hue, color.saturation, color.lightness + edge.energyPulse * 0.05);
       });
       trailMaterial.uniforms.uTime.value = time;
@@ -539,7 +560,7 @@ function CrystalBackground() {
       <button
         onClick={() => {
           setIsFastForward(!isFastForward);
-          speedMultiplierRef.current = isFastForward ? 4 : 80;
+          speedMultiplierRef.current = isFastForward ? 0.5 : 10;
         }}
         className="fixed bottom-8 right-8 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-lg transition-colors z-50"
       >
