@@ -296,7 +296,7 @@ function CrystalBackground() {
       return camera.position.clone().add(dir.multiplyScalar(distance));
     }
 
-    function sampleSourcePoint(buildProgress) {
+    function sampleSourcePoint() {
       // Particles start VISIBLE on screen at random positions (aerial transportation effect)
       // They'll animate/fly toward crystal atoms/edges
       const randX = (Math.random() - 0.5) * 1.8;  // Random X across viewport
@@ -327,7 +327,7 @@ function CrystalBackground() {
       const particle = particles.find((entry) => !entry.active);
       if (!particle) return;
 
-      const start = sampleSourcePoint(buildProgress);
+      const start = sampleSourcePoint();
       const target = selectTarget(buildProgress);
       const orbit = new THREE.Vector3((Math.random() - 0.5) * 1.15, (Math.random() - 0.5) * 1.1, (Math.random() - 0.5) * 1.05);
       const control = new THREE.Vector3()
@@ -346,13 +346,13 @@ function CrystalBackground() {
       particle.duration = 1.4 + Math.random() * 0.8;
       particle.phase = Math.random() * Math.PI * 2;
       const particlePalette = [
-        new THREE.Color('#1e4bda'),
-        new THREE.Color('#3f7cff'),
-        new THREE.Color('#5d34ff'),
-        new THREE.Color('#1fc6b8'),
-        new THREE.Color('#24caff'),
-        new THREE.Color('#7c4cff'),
-        new THREE.Color('#2b7cff')
+        new THREE.Color('#526174'),
+        new THREE.Color('#6f7f91'),
+        new THREE.Color('#8a7862'),
+        new THREE.Color('#6f836f'),
+        new THREE.Color('#7b6f8a'),
+        new THREE.Color('#9a746a'),
+        new THREE.Color('#78828b')
       ];
       particle.color.copy(particlePalette[Math.floor(Math.random() * particlePalette.length)]);
       particle.size = 0.018 + Math.random() * 0.015;
@@ -362,13 +362,17 @@ function CrystalBackground() {
 
     const buildDuration = 15000;
     const buildTargetCount = 3500;
-    let startTime = performance.now();
+    let lastFrameTime = performance.now();
+    let elapsed = 0;
     let time = 0;
     let spawned = 0;
 
     function animate() {
       requestAnimationFrame(animate);
-      const elapsed = (performance.now() - startTime) * speedMultiplierRef.current;
+      const now = performance.now();
+      const frameDelta = Math.min(64, now - lastFrameTime);
+      lastFrameTime = now;
+      elapsed += frameDelta * speedMultiplierRef.current;
       time += 0.016;
       const buildProgress = Math.min(1, spawned / buildTargetCount);
       const densityCurve = 0.28 + 0.72 * (1 - Math.abs(buildProgress * 2 - 1));
@@ -399,36 +403,16 @@ function CrystalBackground() {
       const glimmer = 0.45 + 0.55 * Math.sin(time * 0.4 + Math.PI * 0.5);
 
       const palette = [
-        { hue: 0.625, saturation: 0.90, lightness: 0.26 },  // Deep Sapphire Blue
-        { hue: 0.617, saturation: 0.88, lightness: 0.35 },  // Royal Blue
-        { hue: 0.597, saturation: 0.95, lightness: 0.44 },  // Electric Blue
-        { hue: 0.636, saturation: 0.85, lightness: 0.22 },  // Midnight Blue
-        { hue: 0.575, saturation: 0.80, lightness: 0.42 },  // Azure
-        { hue: 0.528, saturation: 0.90, lightness: 0.28 },  // Deep Cyan
-        { hue: 0.517, saturation: 0.95, lightness: 0.44 },  // Cyan Highlights
-        { hue: 0.500, saturation: 0.90, lightness: 0.40 },  // Aqua
-        { hue: 0.483, saturation: 0.88, lightness: 0.32 },  // Teal
-        { hue: 0.469, saturation: 0.82, lightness: 0.38 },  // Turquoise
-        { hue: 0.389, saturation: 0.92, lightness: 0.36 },  // Emerald Green
-        { hue: 0.406, saturation: 0.85, lightness: 0.30 },  // Jade Green
-        { hue: 0.361, saturation: 0.78, lightness: 0.27 },  // Forest Emerald
-        { hue: 0.375, saturation: 0.88, lightness: 0.32 },  // Deep Emerald
-        { hue: 0.417, saturation: 0.80, lightness: 0.38 },  // Mint Green
-        { hue: 0.347, saturation: 0.72, lightness: 0.30 },  // Hunter Green
-        { hue: 0.430, saturation: 0.75, lightness: 0.42 },  // Sea Green
-        { hue: 0.333, saturation: 0.85, lightness: 0.35 },  // Spring Emerald
-        { hue: 0.278, saturation: 0.70, lightness: 0.32 },  // Olive Green
-        { hue: 0.681, saturation: 0.88, lightness: 0.30 },  // Indigo
-        { hue: 0.736, saturation: 0.90, lightness: 0.25 },  // Deep Violet
-        { hue: 0.764, saturation: 0.88, lightness: 0.36 },  // Royal Purple
-        { hue: 0.778, saturation: 0.82, lightness: 0.40 },  // Amethyst
-        { hue: 0.833, saturation: 0.90, lightness: 0.36 },  // Magenta
-        { hue: 0.861, saturation: 0.92, lightness: 0.42 },  // Fuchsia Accents
-        { hue: 0.972, saturation: 0.88, lightness: 0.28 },  // Deep Crimson
-        { hue: 0.986, saturation: 0.85, lightness: 0.34 },  // Ruby
-        { hue: 0.911, saturation: 0.88, lightness: 0.44 },  // Plasma Pink
-        { hue: 0.556, saturation: 0.25, lightness: 0.75 },  // Arctic White (highlights)
-        { hue: 0.569, saturation: 0.45, lightness: 0.68 },  // Soft Ice Blue (highlights)
+        { hue: 0.605, saturation: 0.34, lightness: 0.33 },
+        { hue: 0.586, saturation: 0.28, lightness: 0.42 },
+        { hue: 0.113, saturation: 0.32, lightness: 0.48 },
+        { hue: 0.092, saturation: 0.26, lightness: 0.39 },
+        { hue: 0.347, saturation: 0.22, lightness: 0.38 },
+        { hue: 0.389, saturation: 0.24, lightness: 0.34 },
+        { hue: 0.736, saturation: 0.24, lightness: 0.37 },
+        { hue: 0.972, saturation: 0.28, lightness: 0.36 },
+        { hue: 0.056, saturation: 0.25, lightness: 0.42 },
+        { hue: 0.556, saturation: 0.12, lightness: 0.68 },
       ];
 
       // Mark crystal build complete
@@ -437,7 +421,7 @@ function CrystalBackground() {
         setBuildComplete(true);
       }
 
-      const cycleDuration = 2000;          // 2s per color step
+      const cycleDuration = 2600;
       const glistenInterval = 20000;        // glisten every 20s
       const glistenDuration = 4500;
       const blockPosition = elapsed % glistenInterval;
@@ -516,8 +500,8 @@ function CrystalBackground() {
         else if (gh2 > gh1 && gh2 - gh1 > 0.5) gh1 += 1;
 
         const gHue = (gh1 * (1 - gProg) + gh2 * gProg) % 1;
-        const gSat = Math.max(0.7, gCur.saturation * (1 - gProg) + gNxt.saturation * gProg);
-        const gLight = Math.min(0.72, (gCur.lightness * (1 - gProg) + gNxt.lightness * gProg) + 0.15);
+        const gSat = Math.max(0.34, gCur.saturation * (1 - gProg) + gNxt.saturation * gProg);
+        const gLight = Math.min(0.68, (gCur.lightness * (1 - gProg) + gNxt.lightness * gProg) + 0.12);
 
         // Blend normal → glisten by glistenFade
         return {
@@ -642,27 +626,25 @@ function CrystalBackground() {
     <>
       <div ref={mountRef} className="fixed inset-0 w-full h-full pointer-events-auto" />
 
-      {/* Fast forward — only during crystal build */}
-      {!buildComplete && (
-        <button
-          onClick={() => {
-            setIsFastForward(!isFastForward);
-            speedMultiplierRef.current = isFastForward ? 0.5 : 10;
-          }}
-          style={{
-            ...btnStyle.base,
-            position: 'fixed',
-            bottom: 24,
-            left: 24,
-            zIndex: 50,
-            ...(isFastForward ? btnStyle.active : btnStyle.inactive),
-          }}
-          onMouseEnter={(e) => btnStyle.hoverEnter(e.currentTarget)}
-          onMouseLeave={(e) => Object.assign(e.currentTarget.style, isFastForward ? btnStyle.active : btnStyle.inactive)}
-        >
-          {isFastForward ? '🐢 Normal Speed' : 'Speed Up'}
-        </button>
-      )}
+      {/* Speed toggle — always visible */}
+      <button
+        onClick={() => {
+          setIsFastForward(!isFastForward);
+          speedMultiplierRef.current = isFastForward ? 0.5 : 10;
+        }}
+        style={{
+          ...btnStyle.base,
+          position: 'fixed',
+          bottom: 24,
+          left: 24,
+          zIndex: 50,
+          ...(isFastForward ? btnStyle.active : btnStyle.inactive),
+        }}
+        onMouseEnter={(e) => btnStyle.hoverEnter(e.currentTarget)}
+        onMouseLeave={(e) => Object.assign(e.currentTarget.style, isFastForward ? btnStyle.active : btnStyle.inactive)}
+      >
+        {isFastForward ? 'Normal Speed' : 'Speed Up'}
+      </button>
 
       {/* Glimmer — appears after crystal is fully built */}
       {buildComplete && (
@@ -676,7 +658,7 @@ function CrystalBackground() {
           style={{
             position: 'fixed',
             bottom: 24,
-            left: 24,
+            left: 148,
             padding: '8px 16px',
             borderRadius: 6,
             fontFamily: 'monospace',
@@ -690,7 +672,7 @@ function CrystalBackground() {
             transition: 'box-shadow 0.1s',
           }}
         >
-          {glimmerActive ? '✦ Glimmering' : '✦ Glimmer'}
+          {glimmerActive ? 'Glimmering' : 'Glimmer'}
         </button>
       )}
     </>

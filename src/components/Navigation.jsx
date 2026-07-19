@@ -2,8 +2,8 @@ import { btn as btnStyle } from '../theme';
 
 function Navigation({ route, setRoute }) {
   const navButtons = [
-    { label: '🏠 Home', route: 'home', active: route === 'home' },
-    { label: '🌌 About', route: 'about', active: route === 'about' }
+    { label: 'Home', route: 'home', active: route === 'home' },
+    { label: 'About', route: 'about', active: route === 'about' }
   ];
 
   return (

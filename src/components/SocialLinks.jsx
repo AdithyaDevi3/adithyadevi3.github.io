@@ -1,3 +1,4 @@
+import { createElement } from 'react';
 import { FaLinkedin, FaGithub, FaEnvelope } from "react-icons/fa";
 import { colors, layout } from '../theme';
 
@@ -22,17 +23,18 @@ const socialLinks = [
 function SocialLinks() {
   return (
     <div style={{ position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)', zIndex: layout.zOverlay, display: 'flex', gap: 12, pointerEvents: 'auto' }}>
-      {socialLinks.map(({ href, icon: Icon, label, target }) => (
+      {socialLinks.map(({ href, icon, label, target }) => (
         <a
           key={label}
           href={href}
           target={target}
+          aria-label={label}
           rel={target ? 'noopener noreferrer' : undefined}
           style={linkStyle}
           onMouseEnter={(e) => e.currentTarget.style.background = colors.bgSocialHover}
           onMouseLeave={(e) => e.currentTarget.style.background = colors.bgSocial}
         >
-          <Icon size={26} />
+          {createElement(icon, { size: 26 })}
         </a>
       ))}
     </div>

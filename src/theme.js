@@ -1,5 +1,5 @@
 // ─── Design Tokens ───────────────────────────────────────────────────────────
-// Warm, clean, human-friendly — no neon. Reads crisp on dark backgrounds.
+// Warm, clean, human-friendly. Reads crisp on dark backgrounds without neon glare.
 
 export const colors = {
   // Warm off-white palette (replaces neon cyan)
@@ -17,11 +17,11 @@ export const colors = {
   textLabel:     'rgba(188,182,172,0.78)',
 
   // Backgrounds
-  bgBase:        '#020611',
-  bgCard:        'rgba(10,8,20,0.62)',
-  bgOverlay:     'rgba(8,6,18,0.68)',
-  bgSocial:      'rgba(8,6,18,0.55)',
-  bgSocialHover: 'rgba(22,18,34,0.78)',
+  bgBase:        '#05070d',
+  bgCard:        'rgba(14,16,20,0.68)',
+  bgOverlay:     'rgba(8,10,14,0.72)',
+  bgSocial:      'rgba(14,16,20,0.62)',
+  bgSocialHover: 'rgba(28,29,32,0.82)',
 
   // Cards / borders
   cardBorder:     'rgba(255,255,255,0.09)',

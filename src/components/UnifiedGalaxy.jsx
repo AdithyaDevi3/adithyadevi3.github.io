@@ -12,6 +12,7 @@ function UnifiedGalaxy() {
 
   useEffect(() => {
     if (!containerRef.current) return;
+    const container = containerRef.current;
 
     // Scene setup
     const scene = new THREE.Scene();
@@ -25,7 +26,7 @@ function UnifiedGalaxy() {
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.16;
-    containerRef.current.appendChild(renderer.domElement);
+    container.appendChild(renderer.domElement);
 
     // Lighting
     const lights = [
@@ -76,7 +77,9 @@ function UnifiedGalaxy() {
       window.removeEventListener('resize', handleResize);
       if (frameIdRef.current) cancelAnimationFrame(frameIdRef.current);
       renderer.dispose();
-      containerRef.current?.removeChild(renderer.domElement);
+      if (renderer.domElement.parentNode === container) {
+        container.removeChild(renderer.domElement);
+      }
     };
   }, []);
 
