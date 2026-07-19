@@ -10,7 +10,7 @@ import HomePage from "./pages/HomePage";
 export default function App() {
   const [route, setRoute] = useState('home');
   return (
-    <div style={{ position: 'relative', width: '100%', minHeight: '100vh', background: '#05070d' }}>
+    <div style={{ position: 'relative', width: '100%', minHeight: '100vh', background: '#08111f' }}>
       {route === 'home' && <HomePage />}
       {route === 'about' && <AboutPage />}
 

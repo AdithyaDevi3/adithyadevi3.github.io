@@ -3,12 +3,12 @@
 
 export const colors = {
   // Warm off-white palette (replaces neon cyan)
-  accent:            '#e8e3db',
-  accentDim:         'rgba(220,215,205,0.62)',
-  accentBorder:      'rgba(255,255,255,0.1)',
-  accentBorderHover: 'rgba(255,255,255,0.22)',
-  accentBg:          'rgba(255,255,255,0.07)',
-  accentBgHover:     'rgba(255,255,255,0.11)',
+  accent:            '#d7a85f',
+  accentDim:         'rgba(215,168,95,0.56)',
+  accentBorder:      'rgba(215,168,95,0.16)',
+  accentBorderHover: 'rgba(215,168,95,0.34)',
+  accentBg:          'rgba(215,168,95,0.08)',
+  accentBgHover:     'rgba(215,168,95,0.13)',
 
   // Text
   textPrimary:   '#e8e3db',
@@ -17,11 +17,11 @@ export const colors = {
   textLabel:     'rgba(188,182,172,0.78)',
 
   // Backgrounds
-  bgBase:        '#05070d',
-  bgCard:        'rgba(14,16,20,0.68)',
-  bgOverlay:     'rgba(8,10,14,0.72)',
-  bgSocial:      'rgba(14,16,20,0.62)',
-  bgSocialHover: 'rgba(28,29,32,0.82)',
+  bgBase:        '#08111f',
+  bgCard:        'rgba(19,26,34,0.72)',
+  bgOverlay:     'rgba(9,14,23,0.76)',
+  bgSocial:      'rgba(21,28,36,0.66)',
+  bgSocialHover: 'rgba(42,39,35,0.84)',
 
   // Cards / borders
   cardBorder:     'rgba(255,255,255,0.09)',

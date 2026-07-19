@@ -8,7 +8,7 @@ export const landingCampaignBranches = [
     id: 'experience',
     label: 'Experience',
     side: 'left',
-    color: '#7f8fa3',
+    color: '#cf765f',
     nodes: [
       {
         id: 'adobe',
@@ -17,7 +17,7 @@ export const landingCampaignBranches = [
         title: 'Developer Platforms Intern',
         period: 'Summer 2026',
         logo: adobeLogo,
-        color: '#a46d68',
+        color: '#d36a5f',
         summary: 'Developer tooling and platform experience work across product and engineering workflows.',
         details: [
           'Exploring platform workflows that make developer onboarding and day-to-day shipping clearer.',
@@ -32,7 +32,7 @@ export const landingCampaignBranches = [
         title: 'Mobile Development Intern',
         period: 'Summer 2025',
         logo: ncrLogo,
-        color: '#7184a1',
+        color: '#668fbd',
         summary: 'Built mobile systems for retail operations and connected commerce experiences.',
         details: [
           'Shipped polished mobile workflows for in-store operational teams.',
@@ -47,7 +47,7 @@ export const landingCampaignBranches = [
         title: 'Software Engineering Intern',
         period: 'Summer 2024',
         logo: novaeLogo,
-        color: '#789181',
+        color: '#75a47f',
         summary: 'Contributed to event-driven systems and modern web interfaces for product operations.',
         details: [
           'Improved message-driven services and monitoring around streaming workflows.',
@@ -62,7 +62,7 @@ export const landingCampaignBranches = [
         title: 'Undergraduate Research',
         period: 'Aug 2024 - May 2025',
         logo: null,
-        color: '#6f8894',
+        color: '#5f9ea0',
         summary: 'Studied translational glycomaterials and neural repair approaches in a collaborative lab setting.',
         details: [
           'Investigated biomaterials for neural repair applications.',
@@ -76,7 +76,7 @@ export const landingCampaignBranches = [
     id: 'education',
     label: 'Education',
     side: 'right',
-    color: '#a9946b',
+    color: '#d7a85f',
     nodes: [
       {
         id: 'education-core',
@@ -85,7 +85,7 @@ export const landingCampaignBranches = [
         title: 'Computer Science Foundation',
         period: 'Academic Path',
         logo: null,
-        color: '#a9946b',
+        color: '#d7a85f',
         summary: 'Coursework and independent study focused on software systems, product building, and applied AI.',
         details: [
           'Building a foundation across algorithms, systems, web engineering, and human-centered software.',
@@ -100,7 +100,7 @@ export const landingCampaignBranches = [
         title: 'Software Systems + Product Engineering',
         period: 'Focus Area',
         logo: null,
-        color: '#9a805b',
+        color: '#bd8548',
         summary: 'A technical lane focused on reliable software, interfaces, and system-level thinking.',
         details: [
           'Combines frontend/product work with backend patterns and system design fundamentals.',
@@ -114,7 +114,7 @@ export const landingCampaignBranches = [
     id: 'projects',
     label: 'Projects',
     side: 'right',
-    color: '#7f8f7b',
+    color: '#75a47f',
     nodes: [
       {
         id: 'curo',
@@ -123,7 +123,7 @@ export const landingCampaignBranches = [
         title: 'Product Engineering Project',
         period: 'Featured Build',
         logo: curoLogo,
-        color: '#7f8f7b',
+        color: '#75a47f',
         summary: 'A product-focused build centered on useful workflows, careful interaction design, and polished execution.',
         details: [
           'Designed the experience around fast scanning, clear actions, and low-friction navigation.',
@@ -138,7 +138,7 @@ export const landingCampaignBranches = [
         title: 'Undergraduate Research',
         period: 'Aug 2024 - May 2025',
         logo: null,
-        color: '#6f8894',
+        color: '#5f9ea0',
         summary: 'Studied translational glycomaterials and neural repair approaches in a collaborative lab setting.',
         details: [
           'Investigated biomaterials for neural repair applications.',
@@ -153,7 +153,7 @@ export const landingCampaignBranches = [
         title: 'Interactive 3D Portfolio',
         period: 'Current Build',
         logo: null,
-        color: '#7f8fa3',
+        color: '#668fbd',
         summary: 'A game-like portfolio interface built around a living crystal, rocket navigation, and explorable detail cards.',
         details: [
           'Uses Three.js and React to turn portfolio navigation into a spatial experience.',

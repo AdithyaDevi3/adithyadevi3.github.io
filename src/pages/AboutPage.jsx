@@ -2,7 +2,7 @@ import { landingCampaignBranches } from '../data/landingCampaignData';
 
 const pageStyle = {
   minHeight: '100vh',
-  background: '#05070d',
+  background: '#08111f',
   color: '#e8e3db',
   padding: '104px 24px 96px',
   boxSizing: 'border-box',
@@ -62,8 +62,8 @@ function AboutPage() {
         </header>
 
         {landingCampaignBranches.map((branch) => (
-          <section key={branch.id} style={sectionStyle}>
-            <h2 style={{ margin: '0 0 4px', fontSize: 20, fontWeight: 700, color: '#e8e3db' }}>{branch.label}</h2>
+          <section key={branch.id} style={{ ...sectionStyle, borderTopColor: `${branch.color}88` }}>
+            <h2 style={{ margin: '0 0 4px', fontSize: 20, fontWeight: 700, color: branch.color }}>{branch.label}</h2>
             <div>
               {branch.nodes.map((item) => (
                 <article key={item.id} style={rowStyle}>
