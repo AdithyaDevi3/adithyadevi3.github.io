@@ -72,7 +72,7 @@ function AboutPage() {
                       <img
                         src={item.logo}
                         alt={item.name}
-                        style={{ width: 64, height: 64, objectFit: 'contain', filter: 'grayscale(1)', border: '1px solid rgba(255,255,255,0.14)', padding: 8, boxSizing: 'border-box', background: 'rgba(255,255,255,0.92)' }}
+                        style={{ width: 64, height: 64, objectFit: 'contain', filter: 'none', border: '1px solid rgba(255,255,255,0.14)', borderRadius: 8, padding: 8, boxSizing: 'border-box', background: '#ffffff' }}
                       />
                     ) : (
                       <FallbackMark name={item.name} />

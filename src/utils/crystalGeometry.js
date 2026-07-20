@@ -1,5 +1,23 @@
 import * as THREE from 'three';
 
+export const crystalColorPalette = [
+  '#2f80ed',
+  '#2563eb',
+  '#0f9f6e',
+  '#16a34a',
+  '#7c3aed',
+  '#9333ea',
+  '#dc2626',
+  '#e11d48',
+  '#f97316',
+  '#ea580c',
+  '#06b6d4',
+  '#22c55e',
+  '#a855f7',
+  '#ef4444',
+  '#f59e0b'
+];
+
 
 function createCrystalGeometry(structureGroup, starTexture) {
   const atoms = [];
@@ -61,10 +79,10 @@ function createCrystalGeometry(structureGroup, starTexture) {
     }
   }
 
-  edgeVertices.forEach((pos) => {
+  edgeVertices.forEach((pos, index) => {
     const spriteMaterial = new THREE.SpriteMaterial({
       map: starTexture,
-      color: new THREE.Color(0xccddff),
+      color: new THREE.Color(crystalColorPalette[index % crystalColorPalette.length]),
       transparent: true,
       opacity: 0,
       blending: THREE.AdditiveBlending
@@ -82,7 +100,8 @@ function createCrystalGeometry(structureGroup, starTexture) {
       targetScale,
       glimmerOffset: Math.random() * Math.PI * 2,
       glimmerSpeed: 0.8 + Math.random() * 1.2,
-      position: pos.clone()
+      position: pos.clone(),
+      paletteIndex: index % crystalColorPalette.length
     });
   });
 
@@ -94,7 +113,7 @@ function createCrystalGeometry(structureGroup, starTexture) {
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
         
         const material = new THREE.LineBasicMaterial({
-          color: new THREE.Color(0x88aadd),
+          color: new THREE.Color(crystalColorPalette[(i + j) % crystalColorPalette.length]),
           transparent: true,
           opacity: 0,
           blending: THREE.AdditiveBlending
@@ -107,6 +126,7 @@ function createCrystalGeometry(structureGroup, starTexture) {
           line,
           atom1: atoms[i],
           atom2: atoms[j],
+          paletteIndex: (i + j) % crystalColorPalette.length,
           glimmerOffset: Math.random() * Math.PI * 2,
           glimmerSpeed: 0.5 + Math.random() * 1.0,
           baseOpacity: 0.15 + Math.random() * 0.15

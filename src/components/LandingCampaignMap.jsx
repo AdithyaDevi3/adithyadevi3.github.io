@@ -8,7 +8,7 @@ const MotionDiv = motion.div;
 
 const routeDefinitions = {
   left: {
-    color: '#cf765f',
+    color: '#2563eb',
     points: [
       [0, -1.2, 0.55],
       [-1.2, -1.34, -1.4],
@@ -17,7 +17,7 @@ const routeDefinitions = {
     ]
   },
   right: {
-    color: '#75a47f',
+    color: '#2563eb',
     points: [
       [0, -1.2, 0.55],
       [1.2, -1.32, -1.4],
@@ -34,7 +34,7 @@ const navigationTargets = [
     eyebrow: 'Left Path',
     label: 'Experience',
     description: 'Internships, research, and real team work.',
-    color: '#cf765f',
+    color: '#2563eb',
     branchIds: ['experience']
   },
   {
@@ -43,7 +43,7 @@ const navigationTargets = [
     eyebrow: 'Right Path',
     label: 'Education + Projects',
     description: 'Academic path, builds, and experiments.',
-    color: '#75a47f',
+    color: '#2563eb',
     branchIds: ['education', 'projects']
   }
 ];
@@ -101,31 +101,31 @@ function RocketNavigator({ activeRouteId, isWarping }) {
     <group ref={rocketRef} scale={0.78}>
       <mesh rotation={[0, 0, -Math.PI / 2]} position={[0.34, 0, 0]}>
         <coneGeometry args={[0.24, 0.54, 32]} />
-        <meshStandardMaterial color="#cf765f" emissive="#70372d" emissiveIntensity={0.2} roughness={0.34} metalness={0.12} />
+        <meshStandardMaterial color="#f97316" emissive="#c2410c" emissiveIntensity={0.34} roughness={0.28} metalness={0.18} />
       </mesh>
       <mesh rotation={[0, 0, Math.PI / 2]}>
         <capsuleGeometry args={[0.22, 0.58, 12, 24]} />
-        <meshStandardMaterial color="#e6e0d6" emissive="#5a6471" emissiveIntensity={0.08} roughness={0.38} metalness={0.2} />
+        <meshStandardMaterial color="#ffffff" emissive="#dbeafe" emissiveIntensity={0.18} roughness={0.26} metalness={0.26} />
       </mesh>
       <mesh position={[0.07, 0.23, 0.01]}>
         <sphereGeometry args={[0.095, 24, 24]} />
-        <meshStandardMaterial color="#d7a85f" emissive="#79592d" emissiveIntensity={0.26} roughness={0.22} />
+        <meshStandardMaterial color="#60a5fa" emissive="#2563eb" emissiveIntensity={0.38} roughness={0.18} />
       </mesh>
       <mesh position={[-0.38, 0.2, 0]} rotation={[0, 0, -0.55]}>
         <coneGeometry args={[0.12, 0.34, 3]} />
-        <meshStandardMaterial color="#668fbd" emissive="#2d4d70" emissiveIntensity={0.16} roughness={0.38} />
+        <meshStandardMaterial color="#2563eb" emissive="#1d4ed8" emissiveIntensity={0.26} roughness={0.3} />
       </mesh>
       <mesh position={[-0.38, -0.2, 0]} rotation={[0, 0, 0.55]}>
         <coneGeometry args={[0.12, 0.34, 3]} />
-        <meshStandardMaterial color="#668fbd" emissive="#2d4d70" emissiveIntensity={0.16} roughness={0.38} />
+        <meshStandardMaterial color="#2563eb" emissive="#1d4ed8" emissiveIntensity={0.26} roughness={0.3} />
       </mesh>
       <mesh ref={flameRef} position={[-0.58, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
         <coneGeometry args={[0.16, 0.46, 24]} />
-        <meshBasicMaterial color="#d7a85f" transparent opacity={0.76} />
+        <meshBasicMaterial color="#fbbf24" transparent opacity={0.84} />
       </mesh>
       <mesh position={[-0.7, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
         <coneGeometry args={[0.09, 0.36, 20]} />
-        <meshBasicMaterial color="#cf765f" transparent opacity={0.34} />
+        <meshBasicMaterial color="#ea580c" transparent opacity={0.44} />
       </mesh>
     </group>
   );
@@ -139,9 +139,9 @@ function CampaignPathScene({ activeRouteId, isWarping }) {
       gl={{ antialias: true, alpha: true }}
       dpr={[1, 1.5]}
     >
-      <ambientLight intensity={0.65} />
-      <pointLight position={[0, 2.2, 2]} intensity={1.9} color="#d7b98a" />
-      <pointLight position={[3, 0.5, -3]} intensity={1} color="#75a47f" />
+      <ambientLight intensity={0.82} />
+      <pointLight position={[0, 2.2, 2]} intensity={2.15} color="#ffffff" />
+      <pointLight position={[3, 0.5, -3]} intensity={1.25} color="#2563eb" />
       {Object.entries(routeDefinitions).map(([id, route]) => {
         const active = activeRouteId === id;
         return (

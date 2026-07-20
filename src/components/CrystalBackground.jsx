@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
-import createCrystalGeometry from '../utils/crystalGeometry.js';
+import createCrystalGeometry, { crystalColorPalette } from '../utils/crystalGeometry.js';
 import createStarTexture from '../utils/textureUtils.js';
 import { btn as btnStyle } from '../theme';
 
@@ -34,18 +34,18 @@ function CrystalBackground() {
     const mountEl = mountRef.current;
     mountEl.appendChild(renderer.domElement);
 
-    const ambientLight = new THREE.AmbientLight(0x84bfff, 0.24);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.62);
     scene.add(ambientLight);
 
-    const pointLight1 = new THREE.PointLight(0x2f6fff, 2.2, 90, 2);
+    const pointLight1 = new THREE.PointLight(0x2563eb, 1.65, 90, 2);
     pointLight1.position.set(14, 14, 14);
     scene.add(pointLight1);
 
-    const pointLight2 = new THREE.PointLight(0x6a3dff, 1.8, 90, 2);
+    const pointLight2 = new THREE.PointLight(0x0f766e, 1.25, 90, 2);
     pointLight2.position.set(-14, -12, 14);
     scene.add(pointLight2);
 
-    const pointLight3 = new THREE.PointLight(0x19c7b8, 1.4, 90, 2);
+    const pointLight3 = new THREE.PointLight(0xea580c, 0.95, 90, 2);
     pointLight3.position.set(0, 16, -12);
     scene.add(pointLight3);
 
@@ -193,6 +193,17 @@ function CrystalBackground() {
       depthWrite: false,
       blending: THREE.AdditiveBlending,
       vertexColors: true
+    });
+
+    const particlePalette = crystalColorPalette.map((hex) => new THREE.Color(hex));
+    const palette = particlePalette.map((color) => {
+      const hsl = {};
+      color.getHSL(hsl);
+      return {
+        hue: hsl.h,
+        saturation: Math.min(0.78, Math.max(0.28, hsl.s)),
+        lightness: Math.min(0.58, Math.max(0.28, hsl.l))
+      };
     });
 
     const particleSystem = new THREE.Points(particleGeometry, particleMaterial);
@@ -345,15 +356,6 @@ function CrystalBackground() {
       particle.trailPosition.copy(start);
       particle.duration = 1.4 + Math.random() * 0.8;
       particle.phase = Math.random() * Math.PI * 2;
-      const particlePalette = [
-        new THREE.Color('#526174'),
-        new THREE.Color('#6f7f91'),
-        new THREE.Color('#8a7862'),
-        new THREE.Color('#6f836f'),
-        new THREE.Color('#7b6f8a'),
-        new THREE.Color('#9a746a'),
-        new THREE.Color('#78828b')
-      ];
       particle.color.copy(particlePalette[Math.floor(Math.random() * particlePalette.length)]);
       particle.size = 0.018 + Math.random() * 0.015;
       particle.alpha = 0.12 + Math.random() * 0.18;
@@ -399,21 +401,13 @@ function CrystalBackground() {
       pointLight2.position.x = Math.sin(time * 0.24 + Math.PI) * 12;
       pointLight2.position.z = Math.cos(time * 0.24 + Math.PI) * 12;
       pointLight3.position.y = 14 + Math.sin(time * 0.16) * 2;
+      const lightBoost = glimmerActiveRef.current ? 1.55 : 1;
+      ambientLight.intensity = glimmerActiveRef.current ? 0.78 : 0.62;
+      pointLight1.intensity = 1.65 * lightBoost;
+      pointLight2.intensity = 1.25 * lightBoost;
+      pointLight3.intensity = 0.95 * lightBoost;
 
       const glimmer = 0.45 + 0.55 * Math.sin(time * 0.4 + Math.PI * 0.5);
-
-      const palette = [
-        { hue: 0.605, saturation: 0.34, lightness: 0.33 },
-        { hue: 0.586, saturation: 0.28, lightness: 0.42 },
-        { hue: 0.113, saturation: 0.32, lightness: 0.48 },
-        { hue: 0.092, saturation: 0.26, lightness: 0.39 },
-        { hue: 0.347, saturation: 0.22, lightness: 0.38 },
-        { hue: 0.389, saturation: 0.24, lightness: 0.34 },
-        { hue: 0.736, saturation: 0.24, lightness: 0.37 },
-        { hue: 0.972, saturation: 0.28, lightness: 0.36 },
-        { hue: 0.056, saturation: 0.25, lightness: 0.42 },
-        { hue: 0.556, saturation: 0.12, lightness: 0.68 },
-      ];
 
       // Mark crystal build complete
       if (!buildCompleteRef.current && elapsed >= 15000) {
@@ -421,11 +415,11 @@ function CrystalBackground() {
         setBuildComplete(true);
       }
 
-      const cycleDuration = 2600;
+      const forceGlisten = glimmerActiveRef.current;
+      const cycleDuration = forceGlisten ? 950 : 2800;
       const glistenInterval = 20000;        // glisten every 20s
       const glistenDuration = 4500;
       const blockPosition = elapsed % glistenInterval;
-      const forceGlisten = glimmerActiveRef.current;
       const inGlisten = forceGlisten || blockPosition > (glistenInterval - glistenDuration);
       const rawGlistenT = forceGlisten ? 1 : (inGlisten
         ? (blockPosition - (glistenInterval - glistenDuration)) / glistenDuration
@@ -438,7 +432,7 @@ function CrystalBackground() {
 
       // Update glimmer button color from animation loop
       if (glimmerBtnRef.current && buildCompleteRef.current) {
-        const btnSpeed = forceGlisten ? 0.5 : 0.07;
+        const btnSpeed = forceGlisten ? 1.4 : 0.07;
         const btnElapsed = elapsed * btnSpeed;
         const btnIdx = Math.floor(btnElapsed / cycleDuration) % palette.length;
         const btnProg = (btnElapsed % cycleDuration) / cycleDuration;
@@ -447,15 +441,16 @@ function CrystalBackground() {
         if (bh2 < bh1 && bh1 - bh2 > 0.5) bh2 += 1;
         else if (bh2 > bh1 && bh2 - bh1 > 0.5) bh1 += 1;
         const btnHue = ((bh1 * (1 - btnProg) + bh2 * btnProg) % 1) * 360;
-        const btnL = forceGlisten ? 60 : 50;
-        const btnS = forceGlisten ? 95 : 78;
-        const glow = forceGlisten ? 8 + 5 * Math.sin(elapsed / 250) : 4 + 2 * Math.sin(elapsed / 700);
+        const btnL = forceGlisten ? 50 : 38;
+        const btnS = forceGlisten ? 82 : 58;
         const btnColor = `hsl(${btnHue.toFixed(0)}, ${btnS}%, ${btnL}%)`;
         const btnColorDim = `hsl(${btnHue.toFixed(0)}, ${btnS - 20}%, ${btnL - 15}%)`;
         glimmerBtnRef.current.style.color = btnColor;
         glimmerBtnRef.current.style.borderColor = btnColorDim;
-        glimmerBtnRef.current.style.boxShadow = `0 0 ${glow.toFixed(1)}px ${btnColor}`;
-        glimmerBtnRef.current.style.background = `rgba(${Math.round(btnHue/360*15)}, ${Math.round(12 + btnHue/360*8)}, 28, 0.75)`;
+        glimmerBtnRef.current.style.boxShadow = forceGlisten
+          ? `0 0 18px hsla(${btnHue.toFixed(0)}, ${btnS}%, ${btnL}%, 0.34)`
+          : '0 2px 10px rgba(0,0,0,0.05)';
+        glimmerBtnRef.current.style.background = '#ffffff';
       }
 
       const getSpatialGradientColor = (position, atomIndex = 0) => {
@@ -487,8 +482,8 @@ function CrystalBackground() {
         if (!inGlisten || glistenFade === 0) return normalColor;
 
         // Glisten: each atom cycles the full palette rapidly at its own phase offset
-        const glistenSpeed = 10;
-        const phaseShift = atomIndex * 0.09; // stagger atoms so no two are the same color
+        const glistenSpeed = forceGlisten ? 22 : 10;
+        const phaseShift = atomIndex * 0.13; // stagger atoms so no two are the same color
         const gElapsed = elapsed * glistenSpeed + phaseShift * cycleDuration;
         const gIdx = Math.floor(gElapsed / cycleDuration) % palette.length;
         const gProg = (gElapsed % cycleDuration) / cycleDuration;
@@ -500,8 +495,8 @@ function CrystalBackground() {
         else if (gh2 > gh1 && gh2 - gh1 > 0.5) gh1 += 1;
 
         const gHue = (gh1 * (1 - gProg) + gh2 * gProg) % 1;
-        const gSat = Math.max(0.34, gCur.saturation * (1 - gProg) + gNxt.saturation * gProg);
-        const gLight = Math.min(0.68, (gCur.lightness * (1 - gProg) + gNxt.lightness * gProg) + 0.12);
+        const gSat = Math.min(0.92, Math.max(forceGlisten ? 0.7 : 0.34, gCur.saturation * (1 - gProg) + gNxt.saturation * gProg + (forceGlisten ? 0.16 : 0)));
+        const gLight = Math.min(forceGlisten ? 0.84 : 0.7, (gCur.lightness * (1 - gProg) + gNxt.lightness * gProg) + (forceGlisten ? 0.22 : 0.12));
 
         // Blend normal → glisten by glistenFade
         return {
@@ -520,7 +515,7 @@ function CrystalBackground() {
         atom.energyPulse = Math.max(0, atom.energyPulse - 0.035);
 
         const color = getSpatialGradientColor(atom.position, index);
-        const opacityBoost = inGlisten ? 1 + glistenFade * 0.4 : 1; // brighter during glisten
+        const opacityBoost = inGlisten ? 1 + glistenFade * (forceGlisten ? 0.9 : 0.4) : 1; // brighter during glisten
         atom.sprite.material.opacity = atomProgress * (0.38 + glimmer * 0.34 + atom.energyPulse * 0.16 + 0.06 * Math.sin(time * 0.8 + index * 0.08)) * 0.96 * opacityBoost;
         atom.sprite.material.color.setHSL(color.hue, color.saturation, color.lightness + atom.energyPulse * 0.06);
       });
@@ -580,6 +575,9 @@ function CrystalBackground() {
         edge.energy = Math.max(0, edge.energy - 0.015);
         edge.energyPulse = Math.max(0, edge.energyPulse - 0.03);
         const color = getSpatialGradientColor(midpoint, index);
+        if (inGlisten) {
+          edge.line.material.opacity = Math.min(1, edge.line.material.opacity * (1 + glistenFade * (forceGlisten ? 0.55 : 0.25)));
+        }
         edge.line.material.color.setHSL(color.hue, color.saturation, color.lightness + edge.energyPulse * 0.05);
       });
       trailMaterial.uniforms.uTime.value = time;
@@ -659,17 +657,21 @@ function CrystalBackground() {
             position: 'fixed',
             bottom: 24,
             left: 148,
-            padding: '8px 16px',
-            borderRadius: 6,
-            fontFamily: 'monospace',
-            fontWeight: 700,
-            fontSize: 12,
-            letterSpacing: '0.06em',
+            padding: '12px 20px',
+            borderRadius: 7,
+            fontFamily: btnStyle.base.fontFamily,
+            fontWeight: 500,
+            fontSize: 13,
+            letterSpacing: '0',
             cursor: 'pointer',
+            minWidth: 0,
+            maxWidth: 'calc(100vw - 48px)',
+            whiteSpace: 'normal',
+            overflowWrap: 'break-word',
             border: '1px solid',
-            backdropFilter: 'blur(8px)',
+            background: '#ffffff',
             zIndex: 50,
-            transition: 'box-shadow 0.1s',
+            transition: 'transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease',
           }}
         >
           {glimmerActive ? 'Glimmering' : 'Glimmer'}

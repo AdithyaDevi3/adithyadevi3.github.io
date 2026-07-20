@@ -1,44 +1,45 @@
 // ─── Design Tokens ───────────────────────────────────────────────────────────
-// Warm, clean, human-friendly. Reads crisp on dark backgrounds without neon glare.
+// Engineering software palette: light, precise, and restrained.
 
 export const colors = {
-  // Warm off-white palette (replaces neon cyan)
-  accent:            '#d7a85f',
-  accentDim:         'rgba(215,168,95,0.56)',
-  accentBorder:      'rgba(215,168,95,0.16)',
-  accentBorderHover: 'rgba(215,168,95,0.34)',
-  accentBg:          'rgba(215,168,95,0.08)',
-  accentBgHover:     'rgba(215,168,95,0.13)',
+  accent:            '#2563eb',
+  accentDim:         'rgba(37,99,235,0.56)',
+  accentBorder:      'rgba(37,99,235,0.16)',
+  accentBorderHover: 'rgba(37,99,235,0.34)',
+  accentBg:          'rgba(37,99,235,0.08)',
+  accentBgHover:     'rgba(37,99,235,0.13)',
 
   // Text
-  textPrimary:   '#e8e3db',
-  textSecondary: 'rgba(210,205,196,0.82)',
-  textMuted:     'rgba(162,156,146,0.72)',
-  textLabel:     'rgba(188,182,172,0.78)',
+  textPrimary:   '#111827',
+  textSecondary: '#4b5563',
+  textMuted:     '#64748b',
+  textLabel:     '#475569',
 
   // Backgrounds
   bgBase:        '#08111f',
-  bgCard:        'rgba(19,26,34,0.72)',
-  bgOverlay:     'rgba(9,14,23,0.76)',
-  bgSocial:      'rgba(21,28,36,0.66)',
-  bgSocialHover: 'rgba(42,39,35,0.84)',
+  bgCard:        'rgba(255,255,255,0.92)',
+  bgOverlay:     'rgba(248,250,252,0.82)',
+  bgSocial:      'rgba(255,255,255,0.92)',
+  bgSocialHover: '#f3f4f6',
 
   // Cards / borders
-  cardBorder:     'rgba(255,255,255,0.09)',
-  cardBorderLeft: 'rgba(255,255,255,0.14)',
-  techBg:         'rgba(255,255,255,0.05)',
-  techText:       'rgba(222,217,208,0.88)',
-  projectText:    'rgba(188,182,172,0.8)',
+  cardBorder:     '#e5e7eb',
+  cardBorderLeft: '#d1d5db',
+  techBg:         '#f3f4f6',
+  techText:       '#1f2937',
+  projectText:    '#4b5563',
 };
 
 // ─── Typography ──────────────────────────────────────────────────────────────
 
-const SANS = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+const SANS = "var(--font-heading)";
+const BODY = "var(--font-body)";
+const MONO = "var(--font-mono)";
 
 export const font = {
   sans:      SANS,
-  mono:      SANS,   // keep 'mono' key for compatibility — now maps to sans
-  sansSerif: SANS,
+  mono:      MONO,
+  sansSerif: BODY,
 
   // Sizes
   xs:   11,
@@ -60,40 +61,46 @@ export const font = {
 
 export const btn = {
   base: {
-    padding: '8px 18px',
-    borderRadius: 8,
+    padding: '12px 20px',
+    borderRadius: 7,
     fontFamily: SANS,
-    fontWeight: 400,
-    fontSize: 13,
+    fontWeight: 600,
+    fontSize: 14,
+    lineHeight: 1.25,
     letterSpacing: '0.01em',
     cursor: 'pointer',
-    transition: 'all 0.15s ease',
-    backdropFilter: 'blur(14px)',
-    border: '1px solid rgba(255,255,255,0.09)',
-    background: 'rgba(8,6,18,0.55)',
-    color: 'rgba(188,182,172,0.68)',
+    minWidth: 0,
+    maxWidth: 'calc(100vw - 48px)',
+    whiteSpace: 'normal',
+    overflowWrap: 'break-word',
+    transition: 'transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease',
+    border: '1px solid var(--button-border)',
+    background: 'var(--button-bg)',
+    color: '#111827',
+    boxShadow: 'var(--button-shadow)',
   },
   active: {
-    color: '#e8e3db',
-    border: '1px solid rgba(232,227,219,0.22)',
-    background: 'rgba(255,255,255,0.08)',
+    color: '#ffffff',
+    border: '1px solid var(--accent)',
+    background: 'var(--accent)',
     fontWeight: 500,
   },
   inactive: {
-    color: 'rgba(188,182,172,0.68)',
-    border: '1px solid rgba(255,255,255,0.09)',
-    background: 'rgba(8,6,18,0.55)',
-    fontWeight: 400,
+    color: '#111827',
+    border: '1px solid var(--button-border)',
+    background: 'var(--button-bg)',
+    fontWeight: 500,
   },
   hoverEnter: (el) => {
-    el.style.color = 'rgba(228,224,216,0.9)';
-    el.style.borderColor = 'rgba(255,255,255,0.18)';
-    el.style.background = 'rgba(255,255,255,0.06)';
+    el.style.color = '#111827';
+    el.style.borderColor = 'var(--button-border-hover)';
+    el.style.background = 'var(--button-bg-hover)';
+    el.style.transform = 'translateY(-1px)';
+    el.style.boxShadow = 'var(--button-shadow-hover)';
   },
   hoverLeave: (el) => {
-    el.style.color = 'rgba(188,182,172,0.68)';
-    el.style.borderColor = 'rgba(255,255,255,0.09)';
-    el.style.background = 'rgba(8,6,18,0.55)';
+    el.style.transform = 'translateY(0)';
+    el.style.boxShadow = 'var(--button-shadow)';
   },
 };
 

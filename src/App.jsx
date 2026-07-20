@@ -6,11 +6,17 @@ import SocialLinks from "./components/SocialLinks";
 import Navigation from "./components/Navigation";
 import AboutPage from "./pages/AboutPage";
 import HomePage from "./pages/HomePage";
+import { colors } from "./theme";
 
 export default function App() {
   const [route, setRoute] = useState('home');
+
   return (
-    <div style={{ position: 'relative', width: '100%', minHeight: '100vh', background: '#08111f' }}>
+    <div
+      className="app-shell"
+      data-font-theme="inter"
+      style={{ position: 'relative', width: '100%', minHeight: '100vh', background: colors.bgBase }}
+    >
       {route === 'home' && <HomePage />}
       {route === 'about' && <AboutPage />}
 
