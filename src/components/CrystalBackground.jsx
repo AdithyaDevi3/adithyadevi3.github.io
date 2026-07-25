@@ -441,15 +441,15 @@ function CrystalBackground() {
         if (bh2 < bh1 && bh1 - bh2 > 0.5) bh2 += 1;
         else if (bh2 > bh1 && bh2 - bh1 > 0.5) bh1 += 1;
         const btnHue = ((bh1 * (1 - btnProg) + bh2 * btnProg) % 1) * 360;
-        const btnL = forceGlisten ? 50 : 38;
-        const btnS = forceGlisten ? 82 : 58;
+        const btnL = forceGlisten ? 56 : 44;
+        const btnS = forceGlisten ? 92 : 68;
         const btnColor = `hsl(${btnHue.toFixed(0)}, ${btnS}%, ${btnL}%)`;
         const btnColorDim = `hsl(${btnHue.toFixed(0)}, ${btnS - 20}%, ${btnL - 15}%)`;
         glimmerBtnRef.current.style.color = btnColor;
         glimmerBtnRef.current.style.borderColor = btnColorDim;
         glimmerBtnRef.current.style.boxShadow = forceGlisten
-          ? `0 0 18px hsla(${btnHue.toFixed(0)}, ${btnS}%, ${btnL}%, 0.34)`
-          : '0 2px 10px rgba(0,0,0,0.05)';
+          ? `0 0 30px hsla(${btnHue.toFixed(0)}, ${btnS}%, ${btnL}%, 0.46)`
+          : '0 4px 18px rgba(0,0,0,0.08)';
         glimmerBtnRef.current.style.background = '#ffffff';
       }
 
@@ -495,8 +495,8 @@ function CrystalBackground() {
         else if (gh2 > gh1 && gh2 - gh1 > 0.5) gh1 += 1;
 
         const gHue = (gh1 * (1 - gProg) + gh2 * gProg) % 1;
-        const gSat = Math.min(0.92, Math.max(forceGlisten ? 0.7 : 0.34, gCur.saturation * (1 - gProg) + gNxt.saturation * gProg + (forceGlisten ? 0.16 : 0)));
-        const gLight = Math.min(forceGlisten ? 0.84 : 0.7, (gCur.lightness * (1 - gProg) + gNxt.lightness * gProg) + (forceGlisten ? 0.22 : 0.12));
+        const gSat = Math.min(0.98, Math.max(forceGlisten ? 0.78 : 0.44, gCur.saturation * (1 - gProg) + gNxt.saturation * gProg + (forceGlisten ? 0.22 : 0.08)));
+        const gLight = Math.min(forceGlisten ? 0.92 : 0.78, (gCur.lightness * (1 - gProg) + gNxt.lightness * gProg) + (forceGlisten ? 0.28 : 0.16));
 
         // Blend normal → glisten by glistenFade
         return {
@@ -624,59 +624,56 @@ function CrystalBackground() {
     <>
       <div ref={mountRef} className="fixed inset-0 w-full h-full pointer-events-auto" />
 
-      {/* Speed toggle — always visible */}
-      <button
-        onClick={() => {
-          setIsFastForward(!isFastForward);
-          speedMultiplierRef.current = isFastForward ? 0.5 : 10;
-        }}
-        style={{
-          ...btnStyle.base,
-          position: 'fixed',
-          bottom: 24,
-          left: 24,
-          zIndex: 50,
-          ...(isFastForward ? btnStyle.active : btnStyle.inactive),
-        }}
-        onMouseEnter={(e) => btnStyle.hoverEnter(e.currentTarget)}
-        onMouseLeave={(e) => Object.assign(e.currentTarget.style, isFastForward ? btnStyle.active : btnStyle.inactive)}
-      >
-        {isFastForward ? 'Normal Speed' : 'Speed Up'}
-      </button>
-
-      {/* Glimmer — appears after crystal is fully built */}
-      {buildComplete && (
+      {/* Controls container to avoid overlap */}
+      <div style={{ position: 'fixed', bottom: 24, left: 24, zIndex: 50, display: 'flex', gap: 12, alignItems: 'center' }}>
+        {/* Speed toggle — always visible */}
         <button
-          ref={glimmerBtnRef}
           onClick={() => {
-            const next = !glimmerActive;
-            setGlimmerActive(next);
-            glimmerActiveRef.current = next;
+            setIsFastForward(!isFastForward);
+            speedMultiplierRef.current = isFastForward ? 0.5 : 10;
           }}
           style={{
-            position: 'fixed',
-            bottom: 24,
-            left: 148,
-            padding: '12px 20px',
-            borderRadius: 7,
-            fontFamily: btnStyle.base.fontFamily,
-            fontWeight: 500,
-            fontSize: 13,
-            letterSpacing: '0',
-            cursor: 'pointer',
-            minWidth: 0,
-            maxWidth: 'calc(100vw - 48px)',
-            whiteSpace: 'normal',
-            overflowWrap: 'break-word',
-            border: '1px solid',
-            background: '#ffffff',
-            zIndex: 50,
-            transition: 'transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease',
+            ...btnStyle.base,
+            ...(isFastForward ? btnStyle.active : btnStyle.inactive),
+            padding: '10px 16px'
           }}
+          onMouseEnter={(e) => btnStyle.hoverEnter(e.currentTarget)}
+          onMouseLeave={(e) => Object.assign(e.currentTarget.style, isFastForward ? btnStyle.active : btnStyle.inactive)}
         >
-          {glimmerActive ? 'Glimmering' : 'Glimmer'}
+          {isFastForward ? 'Normal Speed' : 'Speed Up'}
         </button>
-      )}
+
+        {/* Glimmer — appears after crystal is fully built */}
+        {buildComplete && (
+          <button
+            ref={glimmerBtnRef}
+            onClick={() => {
+              const next = !glimmerActive;
+              setGlimmerActive(next);
+              glimmerActiveRef.current = next;
+            }}
+            style={{
+              padding: '12px 20px',
+              borderRadius: 7,
+              fontFamily: btnStyle.base.fontFamily,
+              fontWeight: 500,
+              fontSize: 13,
+              letterSpacing: '0',
+              cursor: 'pointer',
+              minWidth: 0,
+              maxWidth: 'calc(100vw - 48px)',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              border: '1px solid',
+              background: '#ffffff',
+              transition: 'transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease',
+            }}
+          >
+            {glimmerActive ? 'Glimmering' : 'Glimmer'}
+          </button>
+        )}
+      </div>
     </>
   );
 }
