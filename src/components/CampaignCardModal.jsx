@@ -87,6 +87,16 @@ export default function CampaignCardModal({ item, onClose }) {
                     <span key={skill}>{skill}</span>
                   ))}
                 </span>
+                {(item.repoUrl || item.readmeUrl) && (
+                  <span className="campaign-card-links">
+                    {item.repoUrl && (
+                      <a href={item.repoUrl} target="_blank" rel="noreferrer">View on GitHub</a>
+                    )}
+                    {item.readmeUrl && (
+                      <a href={item.readmeUrl} target="_blank" rel="noreferrer">Open README</a>
+                    )}
+                  </span>
+                )}
               </span>
             </MotionSpan>
           </button>
