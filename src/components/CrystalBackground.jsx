@@ -10,9 +10,7 @@ function CrystalBackground() {
   const speedMultiplierRef = useRef(0.5);
   const [buildComplete, setBuildComplete] = useState(false);
   const buildCompleteRef = useRef(false);
-  const [glimmerActive, setGlimmerActive] = useState(false);
-  const glimmerActiveRef = useRef(false);
-  const glimmerBtnRef = useRef(null);
+  // glimmer button removed — keep periodic glisten behavior only
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -401,11 +399,7 @@ function CrystalBackground() {
       pointLight2.position.x = Math.sin(time * 0.24 + Math.PI) * 12;
       pointLight2.position.z = Math.cos(time * 0.24 + Math.PI) * 12;
       pointLight3.position.y = 14 + Math.sin(time * 0.16) * 2;
-      const lightBoost = glimmerActiveRef.current ? 1.55 : 1;
-      ambientLight.intensity = glimmerActiveRef.current ? 0.78 : 0.62;
-      pointLight1.intensity = 1.65 * lightBoost;
-      pointLight2.intensity = 1.25 * lightBoost;
-      pointLight3.intensity = 0.95 * lightBoost;
+      // light intensity will be adjusted below based on periodic glisten state
 
       const glimmer = 0.45 + 0.55 * Math.sin(time * 0.4 + Math.PI * 0.5);
 
@@ -415,7 +409,7 @@ function CrystalBackground() {
         setBuildComplete(true);
       }
 
-      const forceGlisten = glimmerActiveRef.current;
+      const forceGlisten = false;
       const cycleDuration = forceGlisten ? 950 : 2800;
       const glistenInterval = 20000;        // glisten every 20s
       const glistenDuration = 4500;
@@ -430,28 +424,14 @@ function CrystalBackground() {
           ? (1 - rawGlistenT) / 0.15
           : 1);
 
-      // Update glimmer button color from animation loop
-      if (glimmerBtnRef.current && buildCompleteRef.current) {
-        const btnSpeed = forceGlisten ? 1.4 : 0.07;
-        const btnElapsed = elapsed * btnSpeed;
-        const btnIdx = Math.floor(btnElapsed / cycleDuration) % palette.length;
-        const btnProg = (btnElapsed % cycleDuration) / cycleDuration;
-        const bCur = palette[btnIdx], bNxt = palette[(btnIdx + 1) % palette.length];
-        let bh1 = bCur.hue, bh2 = bNxt.hue;
-        if (bh2 < bh1 && bh1 - bh2 > 0.5) bh2 += 1;
-        else if (bh2 > bh1 && bh2 - bh1 > 0.5) bh1 += 1;
-        const btnHue = ((bh1 * (1 - btnProg) + bh2 * btnProg) % 1) * 360;
-        const btnL = forceGlisten ? 56 : 44;
-        const btnS = forceGlisten ? 92 : 68;
-        const btnColor = `hsl(${btnHue.toFixed(0)}, ${btnS}%, ${btnL}%)`;
-        const btnColorDim = `hsl(${btnHue.toFixed(0)}, ${btnS - 20}%, ${btnL - 15}%)`;
-        glimmerBtnRef.current.style.color = btnColor;
-        glimmerBtnRef.current.style.borderColor = btnColorDim;
-        glimmerBtnRef.current.style.boxShadow = forceGlisten
-          ? `0 0 30px hsla(${btnHue.toFixed(0)}, ${btnS}%, ${btnL}%, 0.46)`
-          : '0 4px 18px rgba(0,0,0,0.08)';
-        glimmerBtnRef.current.style.background = '#ffffff';
-      }
+      // Update light intensities based on periodic glisten state
+      const lightBoost = inGlisten ? 1.55 : 1;
+      ambientLight.intensity = inGlisten ? 0.78 : 0.62;
+      pointLight1.intensity = 1.65 * lightBoost;
+      pointLight2.intensity = 1.25 * lightBoost;
+      pointLight3.intensity = 0.95 * lightBoost;
+
+      // glimmer button removed — no DOM updates here
 
       const getSpatialGradientColor = (position, atomIndex = 0) => {
         const waveProgress = (elapsed % cycleDuration) / cycleDuration;
