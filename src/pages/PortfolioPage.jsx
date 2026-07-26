@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import CareerGalaxy from '../components/CareerGalaxy';
 import { initialPortfolioEntries, initialConnections } from '../data/portfolioData';
+import { landingCampaignNodes } from '../data/landingCampaignData';
 
 function PortfolioPage() {
   const [selectedEntryId, setSelectedEntryId] = useState('ncr');
@@ -81,6 +82,32 @@ function PortfolioPage() {
             ))}
           </div>
         )}
+
+        {/* All projects (GitHub nodes) */}
+        <div style={{ marginTop: 12 }}>
+          <p style={{ margin: '0 0 6px 0', fontSize: 11, fontWeight: 600, color: '#66e8ff', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+            🔗 All Projects
+          </p>
+          <div style={{ maxHeight: 220, overflowY: 'auto', marginTop: 6 }}>
+            {landingCampaignNodes.filter(n => n.category === 'project').map((proj) => (
+              <div key={proj.id} style={{ marginBottom: 8, fontSize: 12, color: '#cbd5e1' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+                  <span style={{ color: '#a0e7e5', fontWeight: 600 }}>{proj.name}</span>
+                  <span style={{ color: '#94a3b8', fontSize: 11 }}>{proj.period}</span>
+                </div>
+                <p style={{ margin: '4px 0 0 0', fontSize: 11, color: '#94a3b8' }}>{proj.summary}</p>
+                <div style={{ marginTop: 6, display: 'flex', gap: 8 }}>
+                  {proj.repoUrl && (
+                    <a href={proj.repoUrl} target="_blank" rel="noreferrer" style={{ color: '#66e8ff', fontSize: 12 }}>Repository</a>
+                  )}
+                  {proj.readmeUrl && (
+                    <a href={proj.readmeUrl} target="_blank" rel="noreferrer" style={{ color: '#66e8ff', fontSize: 12 }}>README</a>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* Click hint */}
         <p style={{
