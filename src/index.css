@@ -10,6 +10,8 @@
   --text-primary: #111827;
   --text-secondary: #4b5563;
   --text-muted: #64748b;
+  --text-on-dark: #e8e3db; /* light text for dark backgrounds */
+  --text-on-light: #111827; /* dark text for light backgrounds */
   --border: #e5e7eb;
   --border-strong: #d1d5db;
   --accent: #2563eb;
@@ -29,7 +31,8 @@ html, body {
   height: 100%;
   background-color: var(--bg);
   font-family: var(--font-body);
-  color: #e8e3db;
+  color: var(--text-on-dark);
+  font-weight: 500;
   -webkit-font-smoothing: antialiased;
   text-rendering: geometricPrecision;
 }
@@ -100,6 +103,24 @@ h1, h2, h3 {
   background: var(--surface);
   border: 1px solid var(--border);
   box-shadow: var(--shadow-sm);
+}
+
+/* Ensure light-on-light contrast errors are avoided: any surface or card
+   UI that uses a light background should use dark text for readability. */
+.about-panel,
+.campaign-gate-card,
+.campaign-tree-header,
+.campaign-tree-screen,
+.campaign-tree-section,
+.campaign-mission-copy,
+.campaign-node,
+.campaign-node-copy,
+.campaign-node-logo,
+.campaign-modal-shell,
+.campaign-modal-backdrop,
+.campaign-screen-section,
+.campaign-screen-map {
+  color: var(--text-on-light) !important;
 }
 
 /* allow page scroll to interact with background */
