@@ -8,7 +8,6 @@ function CrystalBackground() {
   const mountRef = useRef(null);
   const [isFastForward, setIsFastForward] = useState(false);
   const speedMultiplierRef = useRef(0.5);
-  const [buildComplete, setBuildComplete] = useState(false);
   const buildCompleteRef = useRef(false);
   // glimmer button removed — keep periodic glisten behavior only
 
@@ -622,37 +621,6 @@ function CrystalBackground() {
         >
           {isFastForward ? 'Normal Speed' : 'Speed Up'}
         </button>
-
-        {/* Glimmer — appears after crystal is fully built */}
-        {buildComplete && (
-          <button
-            ref={glimmerBtnRef}
-            onClick={() => {
-              const next = !glimmerActive;
-              setGlimmerActive(next);
-              glimmerActiveRef.current = next;
-            }}
-            style={{
-              padding: '12px 20px',
-              borderRadius: 7,
-              fontFamily: btnStyle.base.fontFamily,
-              fontWeight: 500,
-              fontSize: 13,
-              letterSpacing: '0',
-              cursor: 'pointer',
-              minWidth: 0,
-              maxWidth: 'calc(100vw - 48px)',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              border: '1px solid',
-              background: '#ffffff',
-              transition: 'transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease',
-            }}
-          >
-            {glimmerActive ? 'Glimmering' : 'Glimmer'}
-          </button>
-        )}
       </div>
     </>
   );
