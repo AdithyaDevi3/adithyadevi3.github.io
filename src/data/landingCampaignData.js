@@ -2,6 +2,7 @@ import adobeLogo from '../pages/assets/public/adobe-logo.png';
 import curoLogo from '../pages/assets/public/curo-logo.png';
 import ncrLogo from '../pages/assets/public/ncr-voyix-logo.png';
 import novaeLogo from '../pages/assets/public/novae-logo.png';
+import ugaLogo from '../pages/assets/public/uga-logo.png';
 
 export const landingCampaignBranches = [
   {
@@ -56,19 +57,21 @@ export const landingCampaignBranches = [
         skills: ['Spring Boot', 'Angular', 'Kafka', 'MongoDB']
       },
       {
-        id: 'research-experience',
+        id: 'curo',
         category: 'experience',
-        name: 'Research',
-        title: 'Undergraduate Research',
-        period: 'Aug 2024 - May 2025',
-        logo: null,
-        color: '#5f9ea0',
+        name: 'Curo',
+        title: 'Research',
+        period: 'Featured Build',
+        logo: curoLogo,
+        color: '#75a47f',
         summary: 'Studied translational glycomaterials and neural repair approaches in a collaborative lab setting.',
         details: [
-          'Investigated biomaterials for neural repair applications.',
-          'Built reliable experimental documentation and support workflows.'
+          'Designed the experience around fast scanning, clear actions, and low-friction navigation.',
+          'Focused on turning a product idea into a usable, coherent interface.',
+          'Studied translational glycomaterials and neural repair approaches in a collaborative lab setting.',
+          'Investigated biomaterials for neural repair applications and built reliable experimental documentation and support workflows.'
         ],
-        skills: ['Research', 'Materials', 'Neuroscience']
+        skills: ['React', 'Product Design', 'Frontend Systems']
       }
     ]
   },
@@ -81,32 +84,14 @@ export const landingCampaignBranches = [
       {
         id: 'education-core',
         category: 'education',
-        name: 'Education',
-        title: 'Computer Science Foundation',
+        name: 'University of Georgia',
+        title: 'BS Computer Science',
         period: 'Academic Path',
-        logo: null,
+        logo: ugaLogo,
         color: '#d7a85f',
-        summary: 'Coursework and independent study focused on software systems, product building, and applied AI.',
-        details: [
-          'Building a foundation across algorithms, systems, web engineering, and human-centered software.',
-          'Pairing coursework with internships, research, and project-based learning.'
-        ],
+        summary: 'Course work: Data Structures, Algorithms, Software Development, Computer Networks, Operating Systems, Computer Architecture, Systems Programming, Discrete Mathematics, Applied Machine Learning I & II, Robotics, Artificial Intelligence, Distributed Computing',
+        details: [],
         skills: ['Algorithms', 'Systems', 'Web Engineering', 'AI']
-      },
-      {
-        id: 'coursework-systems',
-        category: 'education',
-        name: 'Systems Track',
-        title: 'Software Systems + Product Engineering',
-        period: 'Focus Area',
-        logo: null,
-        color: '#bd8548',
-        summary: 'A technical lane focused on reliable software, interfaces, and system-level thinking.',
-        details: [
-          'Combines frontend/product work with backend patterns and system design fundamentals.',
-          'Feeds directly into internship and project work where usability and engineering quality both matter.'
-        ],
-        skills: ['System Design', 'Frontend', 'Backend', 'Product']
       }
     ]
   },
@@ -116,36 +101,6 @@ export const landingCampaignBranches = [
     side: 'right',
     color: '#75a47f',
     nodes: [
-      {
-        id: 'curo',
-        category: 'project',
-        name: 'Curo',
-        title: 'Product Engineering Project',
-        period: 'Featured Build',
-        logo: curoLogo,
-        color: '#75a47f',
-        summary: 'A product-focused build centered on useful workflows, careful interaction design, and polished execution.',
-        details: [
-          'Designed the experience around fast scanning, clear actions, and low-friction navigation.',
-          'Focused on turning a product idea into a usable, coherent interface.'
-        ],
-        skills: ['React', 'Product Design', 'Frontend Systems']
-      },
-      {
-        id: 'research',
-        category: 'project',
-        name: 'Research',
-        title: 'Undergraduate Research',
-        period: 'Aug 2024 - May 2025',
-        logo: null,
-        color: '#5f9ea0',
-        summary: 'Studied translational glycomaterials and neural repair approaches in a collaborative lab setting.',
-        details: [
-          'Investigated biomaterials for neural repair applications.',
-          'Built reliable experimental documentation and support workflows.'
-        ],
-        skills: ['Research', 'Materials', 'Neuroscience']
-      },
       {
         id: 'portfolio-galaxy',
         category: 'project',

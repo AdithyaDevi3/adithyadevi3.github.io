@@ -577,9 +577,9 @@ main, body {
 .campaign-mission-logo {
   position: relative;
   z-index: 1;
-  width: 52px;
-  height: 52px;
-  border-radius: 12px;
+  width: 80px;
+  height: 80px;
+  border-radius: 18px;
 }
 
 .campaign-mission-copy {
@@ -731,9 +731,9 @@ main, body {
 .campaign-node {
   position: relative;
   width: 100%;
-  min-height: 76px;
+  min-height: 100px;
   display: grid;
-  grid-template-columns: 52px minmax(0, 1fr);
+  grid-template-columns: 76px minmax(0, 1fr);
   gap: 12px;
   align-items: center;
   padding: 11px 12px;
@@ -771,9 +771,9 @@ main, body {
 }
 
 .campaign-node-logo {
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
+  width: 76px;
+  height: 76px;
+  border-radius: 14px;
   display: grid;
   place-items: center;
   background: #ffffff;
@@ -781,8 +781,8 @@ main, body {
 }
 
 .campaign-node-logo img {
-  width: 84%;
-  height: 84%;
+  width: 92%;
+  height: 92%;
   object-fit: contain;
   filter: none;
 }
@@ -889,11 +889,11 @@ main, body {
 }
 
 .campaign-card-logo {
-  width: 138px;
-  height: 138px;
+  width: 188px;
+  height: 188px;
   display: grid;
   place-items: center;
-  border-radius: 16px;
+  border-radius: 22px;
   background: #ffffff;
   border: 1px solid var(--border);
   box-shadow: var(--shadow-sm);
@@ -901,15 +901,15 @@ main, body {
 }
 
 .campaign-card-logo img {
-  width: 82%;
-  height: 82%;
+  width: 92%;
+  height: 92%;
   object-fit: contain;
   filter: none;
 }
 
 .campaign-card-logo span {
   color: var(--node-color);
-  font-size: 34px;
+  font-size: 48px;
   font-weight: 700;
 }
 

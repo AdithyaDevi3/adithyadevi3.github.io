@@ -23,7 +23,7 @@ const sectionStyle = {
 
 const rowStyle = {
   display: 'grid',
-  gridTemplateColumns: '96px minmax(0, 1fr)',
+  gridTemplateColumns: '112px minmax(0, 1fr)',
   gap: 20,
   padding: '22px 0',
   borderBottom: '1px solid rgba(255,255,255,0.08)'
@@ -72,7 +72,7 @@ function AboutPage() {
                       <img
                         src={item.logo}
                         alt={item.name}
-                        style={{ width: 64, height: 64, objectFit: 'contain', filter: 'none', border: '1px solid rgba(255,255,255,0.14)', borderRadius: 8, padding: 8, boxSizing: 'border-box', background: '#ffffff' }}
+                        style={{ width: 80, height: 80, objectFit: 'contain', filter: 'none', border: '1px solid rgba(255,255,255,0.14)', borderRadius: 10, padding: 10, boxSizing: 'border-box', background: '#ffffff' }}
                       />
                     ) : (
                       <FallbackMark name={item.name} />
