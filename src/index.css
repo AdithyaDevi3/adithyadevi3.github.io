@@ -302,9 +302,11 @@ main, body {
   z-index: 12;
   pointer-events: none;
   overflow: hidden;
-  background:
-    radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--node-color) 10%, transparent), transparent 22%),
-    rgba(248, 250, 252, 0.38);
+  background: radial-gradient(
+    circle at 50% 50%,
+    color-mix(in srgb, var(--node-color) 16%, transparent),
+    transparent 22%
+  );
 }
 
 .campaign-warp::before,
@@ -332,7 +334,12 @@ main, body {
   height: 18vmin;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  background: radial-gradient(circle, #f1ede6 0 4%, color-mix(in srgb, var(--node-color) 42%, white) 5% 16%, transparent 58%);
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--node-color) 72%, transparent) 0 4%,
+    color-mix(in srgb, var(--node-color) 42%, transparent) 5% 16%,
+    transparent 58%
+  );
   filter: blur(1px);
   animation: campaignWarpCore 850ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
