@@ -168,17 +168,16 @@ main, body {
 
 .campaign-gate-card {
   position: absolute;
-  width: min(300px, 32vw);
-  min-height: 138px;
+  width: min(280px, 29vw);
+  min-height: 124px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 10px;
-  padding: 20px 22px;
-  border: 1px solid var(--button-border);
-  border-left: 4px solid var(--accent);
-  border-radius: 7px;
-  background: var(--surface);
+  gap: 8px;
+  padding: 18px 20px;
+  border: 1px solid #c8c4bd;
+  border-radius: 0;
+  background: #f4f1eb;
   color: var(--text-primary);
   cursor: pointer;
   pointer-events: auto;
@@ -186,8 +185,8 @@ main, body {
   min-width: 0;
   white-space: normal;
   overflow-wrap: break-word;
-  box-shadow: var(--shadow-sm);
-  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+  box-shadow: none;
+  transition: border-color 120ms ease, background-color 120ms ease;
 }
 
 .campaign-gate-card--left {
@@ -202,18 +201,18 @@ main, body {
 
 .campaign-gate-card:hover,
 .campaign-gate-card:focus-visible {
-  transform: translateY(-1px);
-  border-color: var(--button-border-hover);
-  box-shadow: var(--button-shadow-hover);
+  transform: none;
+  border-color: #0f172a;
+  background: #ffffff;
   outline: none;
 }
 
 .campaign-gate-card span,
 .campaign-tree-header span {
-  color: var(--accent);
-  font-family: var(--font-heading);
-  font-size: 12px;
-  font-weight: 600;
+  color: #475569;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -222,14 +221,14 @@ main, body {
 .campaign-tree-header strong {
   font-family: var(--font-heading);
   font-weight: 700;
-  font-size: clamp(22px, 3vw, 31px);
-  line-height: 1.04;
+  font-size: clamp(21px, 2.4vw, 27px);
+  line-height: 1.08;
 }
 
 .campaign-gate-card small {
   color: var(--text-secondary);
-  font-size: 15px;
-  line-height: 1.5;
+  font-size: 14px;
+  line-height: 1.45;
 }
 
 .campaign-tree {
@@ -296,76 +295,6 @@ main, body {
   box-shadow: var(--shadow-sm);
 }
 
-.campaign-warp {
-  position: absolute;
-  inset: 0;
-  z-index: 12;
-  pointer-events: none;
-  overflow: hidden;
-  background: radial-gradient(
-    circle at 50% 50%,
-    color-mix(in srgb, var(--node-color) 16%, transparent),
-    transparent 22%
-  );
-}
-
-.campaign-warp::before,
-.campaign-warp::after {
-  content: '';
-  position: absolute;
-  inset: -20%;
-  background:
-    repeating-conic-gradient(from 0deg at 50% 50%, transparent 0deg 10deg, color-mix(in srgb, var(--node-color) 12%, transparent) 11deg 12deg, transparent 13deg 28deg);
-  animation: campaignWarpSpin 820ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  opacity: 0.5;
-}
-
-.campaign-warp::after {
-  filter: blur(14px);
-  opacity: 0.38;
-  animation-duration: 940ms;
-}
-
-.campaign-warp-core {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 18vmin;
-  height: 18vmin;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    color-mix(in srgb, var(--node-color) 72%, transparent) 0 4%,
-    color-mix(in srgb, var(--node-color) 42%, transparent) 5% 16%,
-    transparent 58%
-  );
-  filter: blur(1px);
-  animation: campaignWarpCore 850ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.campaign-warp-streak {
-  position: absolute;
-  left: var(--streak-left);
-  top: var(--streak-top);
-  width: var(--streak-length);
-  height: 1px;
-  opacity: var(--streak-opacity);
-  transform-origin: left center;
-  background: linear-gradient(90deg, transparent, rgba(232, 227, 219, 0.78), color-mix(in srgb, var(--node-color) 44%, white), transparent);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--node-color) 20%, transparent);
-  animation: campaignWarpStreak 760ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  animation-delay: var(--streak-delay);
-}
-
-.campaign-warp--left .campaign-warp-streak {
-  transform: rotate(185deg) scaleX(0.1);
-}
-
-.campaign-warp--right .campaign-warp-streak {
-  transform: rotate(-5deg) scaleX(0.1);
-}
-
 .campaign-tree-screen {
   position: absolute;
   inset: 82px clamp(22px, 4vw, 72px) 88px;
@@ -382,25 +311,14 @@ main, body {
   position: absolute;
   inset: -24px;
   z-index: -2;
-  border-radius: 18px;
-  background:
-    linear-gradient(135deg, rgba(255,255,255,0.94), rgba(248,250,252,0.76)),
-    radial-gradient(circle at 16% 18%, color-mix(in srgb, var(--node-color) 7%, transparent), transparent 34%);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-md);
+  border-radius: 0;
+  background: #f4f1eb;
+  border: 1px solid #c8c4bd;
+  box-shadow: none;
 }
 
 .campaign-tree-screen-stars {
-  position: absolute;
-  inset: -26px;
-  z-index: -1;
-  opacity: 0.46;
-  background-image:
-    radial-gradient(circle, rgba(100,116,139,0.24) 0 1px, transparent 1.5px),
-    radial-gradient(circle, color-mix(in srgb, var(--node-color) 22%, transparent) 0 1px, transparent 1.5px);
-  background-position: 0 0, 38px 52px;
-  background-size: 92px 92px, 136px 136px;
-  mask-image: radial-gradient(ellipse at center, #000 0 68%, transparent 100%);
+  display: none;
 }
 
 .campaign-tree-screen-header {
@@ -413,40 +331,42 @@ main, body {
 .campaign-tree-screen-header button {
   width: fit-content;
   max-width: 100%;
-  padding: 12px 20px;
-  border: 1px solid var(--button-border);
-  border-radius: 7px;
-  background: var(--button-bg);
+  padding: 9px 0;
+  border: 0;
+  border-bottom: 1px solid #94a3b8;
+  border-radius: 0;
+  background: transparent;
   color: var(--text-primary);
   cursor: pointer;
   white-space: normal;
   overflow-wrap: break-word;
-  box-shadow: var(--button-shadow);
-  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+  box-shadow: none;
+  transition: border-color 120ms ease, color 120ms ease;
 }
 
 .campaign-tree-screen-header button:hover,
 .campaign-tree-screen-header button:focus-visible {
-  transform: translateY(-1px);
-  border-color: var(--button-border-hover);
-  background: var(--button-bg-hover);
-  color: var(--text-primary);
+  transform: none;
+  border-color: #0f172a;
+  background: transparent;
+  color: #0f172a;
   outline: none;
 }
 
 .campaign-tree-screen-header span {
-  color: var(--accent);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  color: #475569;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .campaign-tree-screen-header h2 {
-  max-width: 9ch;
+  max-width: 12ch;
   margin: 0;
-  font-size: clamp(42px, 7vw, 84px);
-  line-height: 0.9;
+  font-size: clamp(34px, 4vw, 52px);
+  line-height: 1;
   letter-spacing: 0;
 }
 
@@ -482,23 +402,19 @@ main, body {
   aspect-ratio: 1;
   display: grid;
   place-items: center;
-  border: 1px solid color-mix(in srgb, var(--branch-color) 34%, transparent);
-  border-radius: 10px;
-  background: var(--surface-solid);
+  border: 1px solid #c8c4bd;
+  border-radius: 0;
+  background: transparent;
   box-shadow: none;
 }
 
 .campaign-screen-section-title::after {
-  content: '';
-  position: absolute;
-  inset: -11px;
-  border-radius: inherit;
-  border: 1px dashed color-mix(in srgb, var(--branch-color) 22%, transparent);
-  animation: campaignOrbitSpin 18s linear infinite;
+  display: none;
 }
 
 .campaign-screen-section-title span {
-  color: color-mix(in srgb, var(--branch-color) 58%, white);
+  color: #334155;
+  font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -519,11 +435,9 @@ main, body {
   left: 8px;
   top: 14px;
   bottom: 14px;
-  width: 2px;
-  border-radius: 6px;
-  background:
-    linear-gradient(to bottom, transparent, color-mix(in srgb, var(--branch-color) 36%, #64748b), transparent),
-    repeating-linear-gradient(to bottom, transparent 0 16px, rgba(100,116,139,0.22) 17px 18px);
+  width: 1px;
+  border-radius: 0;
+  background: #c8c4bd;
   box-shadow: none;
 }
 
@@ -566,19 +480,13 @@ main, body {
 
 .campaign-mission-orbit::before,
 .campaign-mission-orbit::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  border: 1px solid color-mix(in srgb, var(--node-color) 28%, transparent);
-  box-shadow: none;
+  display: none;
 }
 
 .campaign-mission-orbit::after {
   inset: 8px;
   border-style: dashed;
   opacity: 0.55;
-  animation: campaignOrbitSpin 14s linear infinite reverse;
 }
 
 .campaign-mission-logo {
@@ -586,7 +494,7 @@ main, body {
   z-index: 1;
   width: 80px;
   height: 80px;
-  border-radius: 18px;
+  border-radius: 0;
 }
 
 .campaign-mission-copy {
@@ -594,12 +502,10 @@ main, body {
   display: grid;
   gap: 4px;
   padding: 13px 15px;
-  border: 1px solid var(--button-border);
-  border-radius: 7px;
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--node-color) 5%, transparent), rgba(255,255,255,0.86)),
-    var(--surface-solid);
-  box-shadow: var(--shadow-sm);
+  border: 1px solid #c8c4bd;
+  border-radius: 0;
+  background: #ffffff;
+  box-shadow: none;
   white-space: normal;
   overflow-wrap: break-word;
 }
@@ -610,10 +516,11 @@ main, body {
 }
 
 .campaign-mission-copy span {
-  color: var(--accent);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  color: #475569;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
@@ -640,41 +547,144 @@ main, body {
 .campaign-mission-node:hover .campaign-mission-copy,
 .campaign-mission-node:focus-visible .campaign-mission-copy,
 .campaign-mission-node--selected .campaign-mission-copy {
-  border-color: var(--button-border-hover);
+  border-color: #0f172a;
   background: #ffffff;
-  box-shadow: var(--button-shadow-hover);
+  box-shadow: none;
 }
 
 .campaign-mission-node:hover .campaign-mission-orbit,
 .campaign-mission-node:focus-visible .campaign-mission-orbit,
 .campaign-mission-node--selected .campaign-mission-orbit {
-  transform: scale(1.02);
+  transform: none;
 }
 
 .campaign-mission-node:focus-visible {
   outline: none;
 }
 
-@keyframes campaignWarpSpin {
-  0% { transform: scale(0.25) rotate(0deg); opacity: 0; }
-  20% { opacity: 0.72; }
-  100% { transform: scale(2.4) rotate(42deg); opacity: 0; }
+.project-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
 }
 
-@keyframes campaignWarpCore {
-  0% { transform: translate(-50%, -50%) scale(0.25); opacity: 0.2; }
-  52% { opacity: 0.95; }
-  100% { transform: translate(-50%, -50%) scale(5.8); opacity: 0; }
+.project-flip-card {
+  position: relative;
+  min-height: 188px;
+  perspective: 1000px;
 }
 
-@keyframes campaignWarpStreak {
-  0% { opacity: 0; translate: 0 0; scale: 0.12 1; }
-  22% { opacity: var(--streak-opacity); }
-  100% { opacity: 0; translate: 0 -18px; scale: 1.2 1; }
+.project-flip-card-toggle {
+  width: 100%;
+  height: 100%;
+  min-height: 188px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
 }
 
-@keyframes campaignOrbitSpin {
-  to { transform: rotate(360deg); }
+.project-flip-card-toggle:focus-visible {
+  outline: none;
+}
+
+.project-flip-card-toggle:focus-visible .project-flip-card-inner {
+  outline: 2px solid #0f172a;
+  outline-offset: 3px;
+}
+
+.project-flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 188px;
+  transform-style: preserve-3d;
+  transition: transform 300ms ease;
+}
+
+.project-flip-card--flipped .project-flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.project-flip-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 16px;
+  border: 1px solid #c8c4bd;
+  border-radius: 0;
+  background: #ffffff;
+  backface-visibility: hidden;
+  box-sizing: border-box;
+}
+
+.project-flip-face span {
+  color: #475569;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.project-flip-face strong {
+  color: #0f172a;
+  font-size: 18px;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.project-flip-face small,
+.project-flip-face p {
+  margin: 0;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.project-flip-face em {
+  color: #64748b;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-style: normal;
+}
+
+.project-flip-face--back {
+  padding-bottom: 48px;
+  background: #f4f1eb;
+  transform: rotateY(180deg);
+}
+
+.project-flip-face--back p {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+}
+
+.project-flip-card-link {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  z-index: 2;
+  color: #0f172a;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  opacity: 0;
+  pointer-events: none;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: opacity 120ms ease;
+}
+
+.project-flip-card--flipped .project-flip-card-link {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .campaign-branch {
@@ -1059,6 +1069,10 @@ main, body {
     padding: 0;
   }
 
+  .project-card-grid {
+    grid-template-columns: 1fr;
+  }
+
   .campaign-screen-section {
     grid-template-columns: 1fr;
     gap: 14px;
@@ -1102,17 +1116,5 @@ main, body {
 
   .campaign-card-face {
     padding: 28px 22px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .campaign-warp::before,
-  .campaign-warp::after,
-  .campaign-warp-core,
-  .campaign-warp-streak,
-  .campaign-screen-section-title::after,
-  .campaign-mission-orbit::after {
-    animation-duration: 1ms !important;
-    animation-iteration-count: 1 !important;
   }
 }

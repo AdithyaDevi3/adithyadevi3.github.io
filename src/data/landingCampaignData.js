@@ -102,22 +102,6 @@ export const landingCampaignBranches = [
     color: '#75a47f',
     nodes: [
       {
-        id: 'portfolio-galaxy',
-        category: 'project',
-        name: 'Portfolio Galaxy',
-        title: 'Interactive 3D Portfolio',
-        period: 'Current Build',
-        logo: null,
-        color: '#668fbd',
-        summary: 'A game-like portfolio interface built around a living crystal, rocket navigation, and explorable detail cards.',
-        details: [
-          'Uses Three.js and React to turn portfolio navigation into a spatial experience.',
-          'Focuses on memorable interaction while keeping content discoverable through clear tree nodes.'
-        ],
-        skills: ['Three.js', 'React', 'Interaction Design']
-      }
-      ,
-      {
         id: 'gh-leetcode-app',
         category: 'project',
         name: 'Leetcode-App',

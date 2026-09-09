@@ -1,1 +1,45 @@
-Hi, I'm Adithya. Welcome to my personal portfolio. Some parts are still under construction. Thanks for stopping by :)
+# Adithya Devi — Personal Portfolio
+
+An interactive portfolio built with React, React Three Fiber, and Framer Motion. The home experience uses a 3D campaign map to organize professional experience, education, and selected GitHub projects.
+
+## Status
+
+The portfolio is actively maintained. The campaign map and project directory are functional, while content, accessibility, mobile polish, and loading performance continue to improve.
+
+## Run locally
+
+Requirements: a current Node.js LTS release and npm.
+
+```bash
+npm ci
+npm run dev
+```
+
+Before submitting a change:
+
+```bash
+npm run lint
+npm run build
+```
+
+Use `npm run preview` to inspect the production build locally. `npm run deploy` publishes the generated `dist` directory to GitHub Pages and should only be run by a repository maintainer.
+
+## Architecture
+
+- Vite builds and serves the React application.
+- React Three Fiber and Three.js render the crystal background and campaign-map scene.
+- Portfolio content lives in `src/data/landingCampaignData.js`.
+- Project cards request public GitHub README files in the browser and fall back to the summaries stored with the portfolio data when a request fails.
+
+This is a personal, client-side website. It has no private API, authentication system, or persistent user-data store. Repository links and displayed résumé content remain the responsibility of the site owner.
+
+## Conventions
+
+Changes are developed on focused feature branches and merged into `main` through pull requests. Keep portfolio content in the data modules, reusable presentation behavior in components, and shared visual rules in the existing stylesheets.
+
+## Next improvements
+
+- Add automated interaction and accessibility coverage for the campaign map and project cards.
+- Continue responsive testing and mobile layout refinement.
+- Split the large production JavaScript bundle and defer noncritical 3D code.
+- Keep project descriptions and résumé content current.
