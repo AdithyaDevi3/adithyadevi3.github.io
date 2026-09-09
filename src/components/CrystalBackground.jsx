@@ -8,7 +8,6 @@ function CrystalBackground() {
   const mountRef = useRef(null);
   const [isFastForward, setIsFastForward] = useState(false);
   const speedMultiplierRef = useRef(0.5);
-  const buildCompleteRef = useRef(false);
   // glimmer button removed — keep periodic glisten behavior only
 
   useEffect(() => {
@@ -401,12 +400,6 @@ function CrystalBackground() {
       // light intensity will be adjusted below based on periodic glisten state
 
       const glimmer = 0.45 + 0.55 * Math.sin(time * 0.4 + Math.PI * 0.5);
-
-      // Mark crystal build complete
-      if (!buildCompleteRef.current && elapsed >= 15000) {
-        buildCompleteRef.current = true;
-        setBuildComplete(true);
-      }
 
       const forceGlisten = false;
       const cycleDuration = forceGlisten ? 950 : 2800;

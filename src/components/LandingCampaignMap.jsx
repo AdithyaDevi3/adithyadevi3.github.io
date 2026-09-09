@@ -31,18 +31,18 @@ const navigationTargets = [
   {
     id: 'experience',
     routeId: 'left',
-    eyebrow: 'Left Path',
-    label: 'Experience',
-    description: 'Internships, research, and real team work.',
+    eyebrow: '01 — Experience',
+    label: 'Professional work',
+    description: 'Internships, research, and work with real teams.',
     color: '#2563eb',
     branchIds: ['experience']
   },
   {
     id: 'directory',
     routeId: 'right',
-    eyebrow: 'Right Path',
-    label: 'Education + Projects',
-    description: 'Academic path, builds, and experiments.',
+    eyebrow: '02 — Education & projects',
+    label: 'Learning and building',
+    description: 'Academic work, independent projects, and experiments.',
     color: '#2563eb',
     branchIds: ['education', 'projects']
   }
@@ -69,7 +69,7 @@ function RouteLine({ route, active }) {
   );
 }
 
-function RocketNavigator({ activeRouteId, isWarping }) {
+function RocketNavigator({ activeRouteId }) {
   const rocketRef = useRef(null);
   const flameRef = useRef(null);
   const curves = useMemo(() => ({
@@ -81,7 +81,7 @@ function RocketNavigator({ activeRouteId, isWarping }) {
     if (!rocketRef.current) return;
     const routeId = activeRouteId || (Math.sin(clock.elapsedTime * 0.5) > 0 ? 'right' : 'left');
     const curve = curves[routeId];
-    const destination = isWarping ? 0.93 : activeRouteId ? 0.72 : 0.18 + Math.sin(clock.elapsedTime * 0.65) * 0.045;
+    const destination = activeRouteId ? 0.72 : 0.18 + Math.sin(clock.elapsedTime * 0.65) * 0.045;
     const progress = THREE.MathUtils.clamp(destination, 0.08, 0.94);
     const point = curve.getPointAt(progress);
     const next = curve.getPointAt((progress + 0.01) % 1);
@@ -91,47 +91,54 @@ function RocketNavigator({ activeRouteId, isWarping }) {
     rocketRef.current.position.y += Math.sin(clock.elapsedTime * 3.1) * 0.035;
 
     if (flameRef.current) {
-      const pulse = 1 + Math.sin(clock.elapsedTime * (isWarping ? 28 : 18)) * 0.2;
-      const thrust = isWarping ? 1.9 : 1;
-      flameRef.current.scale.set(0.85 * pulse, thrust * (1.15 + pulse * 0.18), 0.85 * pulse);
+      const pulse = 1 + Math.sin(clock.elapsedTime * 18) * 0.2;
+      flameRef.current.scale.set(0.85 * pulse, 1.15 + pulse * 0.18, 0.85 * pulse);
     }
   });
 
   return (
     <group ref={rocketRef} scale={0.78}>
-      <mesh rotation={[0, 0, -Math.PI / 2]} position={[0.34, 0, 0]}>
-        <coneGeometry args={[0.24, 0.54, 32]} />
-        <meshStandardMaterial color="#f97316" emissive="#c2410c" emissiveIntensity={0.34} roughness={0.28} metalness={0.18} />
+      <mesh rotation={[0, 0, -Math.PI / 2]} position={[0.52, 0, 0]}>
+        <coneGeometry args={[0.235, 0.48, 32]} />
+        <meshStandardMaterial color="#e2e8f0" roughness={0.36} metalness={0.28} />
       </mesh>
-      <mesh rotation={[0, 0, Math.PI / 2]}>
-        <capsuleGeometry args={[0.22, 0.58, 12, 24]} />
-        <meshStandardMaterial color="#ffffff" emissive="#dbeafe" emissiveIntensity={0.18} roughness={0.26} metalness={0.26} />
+      <mesh rotation={[0, 0, Math.PI / 2]} position={[-0.08, 0, 0]}>
+        <capsuleGeometry args={[0.22, 0.86, 12, 24]} />
+        <meshStandardMaterial color="#f8fafc" roughness={0.32} metalness={0.22} />
       </mesh>
-      <mesh position={[0.07, 0.23, 0.01]}>
-        <sphereGeometry args={[0.095, 24, 24]} />
-        <meshStandardMaterial color="#60a5fa" emissive="#2563eb" emissiveIntensity={0.38} roughness={0.18} />
+      <mesh rotation={[0, Math.PI / 2, 0]} position={[0.28, 0, 0]}>
+        <cylinderGeometry args={[0.232, 0.232, 0.1, 32]} />
+        <meshStandardMaterial color="#d36a5f" roughness={0.4} metalness={0.2} />
       </mesh>
-      <mesh position={[-0.38, 0.2, 0]} rotation={[0, 0, -0.55]}>
-        <coneGeometry args={[0.12, 0.34, 3]} />
-        <meshStandardMaterial color="#2563eb" emissive="#1d4ed8" emissiveIntensity={0.26} roughness={0.3} />
+      <mesh position={[0.1, 0.225, 0.11]}>
+        <sphereGeometry args={[0.105, 24, 24]} />
+        <meshStandardMaterial color="#0f3b66" emissive="#2563eb" emissiveIntensity={0.16} roughness={0.12} metalness={0.62} />
       </mesh>
-      <mesh position={[-0.38, -0.2, 0]} rotation={[0, 0, 0.55]}>
-        <coneGeometry args={[0.12, 0.34, 3]} />
-        <meshStandardMaterial color="#2563eb" emissive="#1d4ed8" emissiveIntensity={0.26} roughness={0.3} />
+      <mesh position={[-0.44, 0.24, 0]} rotation={[0, 0, -0.62]}>
+        <coneGeometry args={[0.13, 0.42, 3]} />
+        <meshStandardMaterial color="#d36a5f" roughness={0.42} metalness={0.16} />
       </mesh>
-      <mesh ref={flameRef} position={[-0.58, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-        <coneGeometry args={[0.16, 0.46, 24]} />
-        <meshBasicMaterial color="#fbbf24" transparent opacity={0.84} />
+      <mesh position={[-0.44, -0.24, 0]} rotation={[0, 0, 0.62]}>
+        <coneGeometry args={[0.13, 0.42, 3]} />
+        <meshStandardMaterial color="#d36a5f" roughness={0.42} metalness={0.16} />
       </mesh>
-      <mesh position={[-0.7, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-        <coneGeometry args={[0.09, 0.36, 20]} />
-        <meshBasicMaterial color="#ea580c" transparent opacity={0.44} />
+      <mesh rotation={[0, 0, Math.PI / 2]} position={[-0.68, 0, 0]}>
+        <cylinderGeometry args={[0.16, 0.11, 0.18, 24]} />
+        <meshStandardMaterial color="#475569" roughness={0.34} metalness={0.72} />
+      </mesh>
+      <mesh ref={flameRef} position={[-0.84, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <coneGeometry args={[0.13, 0.42, 24]} />
+        <meshBasicMaterial color="#fbbf24" transparent opacity={0.82} />
+      </mesh>
+      <mesh position={[-0.96, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <coneGeometry args={[0.07, 0.28, 20]} />
+        <meshBasicMaterial color="#fb7185" transparent opacity={0.5} />
       </mesh>
     </group>
   );
 }
 
-function CampaignPathScene({ activeRouteId, isWarping }) {
+function CampaignPathScene({ activeRouteId }) {
   return (
     <Canvas
       className="campaign-map-canvas"
@@ -150,7 +157,7 @@ function CampaignPathScene({ activeRouteId, isWarping }) {
           </group>
         );
       })}
-      <RocketNavigator activeRouteId={activeRouteId} isWarping={isWarping} />
+      <RocketNavigator activeRouteId={activeRouteId} />
     </Canvas>
   );
 }
@@ -163,41 +170,81 @@ function FallbackLogo({ item }) {
   );
 }
 
-function LightSpeedTransition({ target }) {
-  const streaks = useMemo(() => Array.from({ length: 64 }, (_, index) => ({
-    id: index,
-    top: 4 + Math.random() * 92,
-    left: 6 + Math.random() * 88,
-    delay: Math.random() * 0.22,
-    length: 70 + Math.random() * 220,
-    opacity: 0.28 + Math.random() * 0.54
-  })), []);
+function readmeRawUrl(readmeUrl) {
+  return readmeUrl
+    ?.replace('https://github.com/', 'https://raw.githubusercontent.com/')
+    .replace('/blob/', '/');
+}
+
+function readmeSummary(markdown, fallback) {
+  const line = markdown
+    .split('\n')
+    .map((value) => value.trim())
+    .find((value) => value.length > 36 && !value.startsWith('#') && !value.startsWith('![') && !value.startsWith('[') && !value.startsWith('```'));
+
+  if (!line) return fallback;
+  const plainText = line.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/[*_`>|]/g, '').trim();
+  return plainText.length > 360 ? `${plainText.slice(0, 357)}...` : plainText;
+}
+
+function ProjectFlipCard({ item }) {
+  const [flipped, setFlipped] = useState(false);
+  const [summary, setSummary] = useState(item.summary);
+  const [isLoading, setIsLoading] = useState(Boolean(item.readmeUrl));
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const url = readmeRawUrl(item.readmeUrl);
+    if (!url) return undefined;
+
+    fetch(url, { signal: controller.signal })
+      .then((response) => {
+        if (!response.ok) throw new Error('README request failed');
+        return response.text();
+      })
+      .then((markdown) => setSummary(readmeSummary(markdown, item.summary)))
+      .catch(() => setSummary(item.summary))
+      .finally(() => setIsLoading(false));
+
+    return () => controller.abort();
+  }, [item.readmeUrl, item.summary]);
 
   return (
-    <MotionDiv
-      className={`campaign-warp campaign-warp--${target.routeId}`}
-      style={{ '--node-color': target.color }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.18 }}
-      aria-hidden="true"
+    <article
+      className={`project-flip-card ${flipped ? 'project-flip-card--flipped' : ''}`}
     >
-      <div className="campaign-warp-core" />
-      {streaks.map((streak) => (
-        <span
-          key={streak.id}
-          className="campaign-warp-streak"
-          style={{
-            '--streak-top': `${streak.top}%`,
-            '--streak-left': `${streak.left}%`,
-            '--streak-delay': `${streak.delay}s`,
-            '--streak-length': `${streak.length}px`,
-            '--streak-opacity': streak.opacity
-          }}
-        />
-      ))}
-    </MotionDiv>
+      <button
+        type="button"
+        className="project-flip-card-toggle"
+        aria-expanded={flipped}
+        aria-label={`${flipped ? 'Hide' : 'Show'} README summary for ${item.name}`}
+        onClick={() => setFlipped((value) => !value)}
+      >
+        <div className="project-flip-card-inner">
+          <div className="project-flip-face project-flip-face--front" aria-hidden={flipped}>
+            <span>Project</span>
+            <strong>{item.name}</strong>
+            <small>{item.skills.join(' · ')}</small>
+            <em>Click for README</em>
+          </div>
+          <div className="project-flip-face project-flip-face--back" aria-hidden={!flipped}>
+            <span>README</span>
+            <p>{isLoading ? 'Loading project README…' : summary}</p>
+            <em>Click card to return</em>
+          </div>
+        </div>
+      </button>
+      <a
+        className="project-flip-card-link"
+        href={item.repoUrl}
+        target="_blank"
+        rel="noreferrer"
+        tabIndex={flipped ? 0 : -1}
+        aria-hidden={!flipped}
+      >
+        View repository ↗
+      </a>
+    </article>
   );
 }
 
@@ -229,7 +276,11 @@ function CampaignTreeScreen({ target, branches, selectedNodeId, onBack, onSelect
             <div className="campaign-screen-section-title">
               <span>{branch.label}</span>
             </div>
-            <div className="campaign-mission-path">
+            {branch.id === 'projects' ? (
+              <div className="project-card-grid">
+                {branch.nodes.map((item) => <ProjectFlipCard key={item.id} item={item} />)}
+              </div>
+            ) : <div className="campaign-mission-path">
               {branch.nodes.map((item, nodeIndex) => {
                 const isSelected = selectedNodeId === item.id;
                 return (
@@ -253,7 +304,7 @@ function CampaignTreeScreen({ target, branches, selectedNodeId, onBack, onSelect
                   </button>
                 );
               })}
-            </div>
+            </div>}
           </section>
         ))}
       </div>
@@ -265,34 +316,20 @@ export default function LandingCampaignMap({ selectedNodeId, onSelectNode }) {
   const [activeRouteId, setActiveRouteId] = useState(null);
   const [activeTreeId, setActiveTreeId] = useState(null);
   const [viewState, setViewState] = useState('landing');
-  const [transitionTarget, setTransitionTarget] = useState(null);
-  const transitionTimerRef = useRef(null);
   const activeTarget = navigationTargets.find((target) => target.id === activeTreeId);
-  const visibleTarget = activeTarget || transitionTarget;
   const visibleBranches = activeTarget
     ? landingCampaignBranches.filter((branch) => activeTarget.branchIds.includes(branch.id))
     : [];
 
-  useEffect(() => () => {
-    if (transitionTimerRef.current) window.clearTimeout(transitionTimerRef.current);
-  }, []);
-
   function selectTree(target) {
-    if (transitionTimerRef.current) window.clearTimeout(transitionTimerRef.current);
-    setTransitionTarget(target);
     setActiveRouteId(target.routeId);
-    setViewState('transition');
-    transitionTimerRef.current = window.setTimeout(() => {
-      setActiveTreeId(target.id);
-      setViewState('tree');
-    }, 850);
+    setActiveTreeId(target.id);
+    setViewState('tree');
   }
 
   function returnToLanding() {
-    if (transitionTimerRef.current) window.clearTimeout(transitionTimerRef.current);
     setViewState('landing');
     setActiveTreeId(null);
-    setTransitionTarget(null);
     setActiveRouteId(null);
   }
 
@@ -307,7 +344,7 @@ export default function LandingCampaignMap({ selectedNodeId, onSelectNode }) {
 
   return (
     <section className="campaign-map" aria-label="Interactive career campaign map">
-      <CampaignPathScene activeRouteId={activeRouteId} isWarping={viewState === 'transition'} />
+      <CampaignPathScene activeRouteId={activeRouteId} />
 
       {viewState !== 'tree' && <div className="campaign-horizon" aria-hidden="true" />}
 
@@ -340,10 +377,6 @@ export default function LandingCampaignMap({ selectedNodeId, onSelectNode }) {
               </button>
             ))}
           </MotionDiv>
-        )}
-
-        {viewState === 'transition' && visibleTarget && (
-          <LightSpeedTransition key="warp" target={visibleTarget} />
         )}
 
         {viewState === 'tree' && activeTarget && (
