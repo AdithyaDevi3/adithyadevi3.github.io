@@ -1,19 +1,10 @@
 import { createElement } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import { FaLinkedin, FaGithub, FaEnvelope } from "react-icons/fa";
-import { layout } from '../theme';
+import { motionSpring, sequenceDelay } from '../motion';
 
-const linkStyle = {
-  color: 'var(--accent)',
-  padding: '8px 12px',
-  borderRadius: 8,
-  background: 'var(--button-bg)',
-  border: '1px solid var(--button-border)',
-  transition: 'transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease',
-  boxShadow: 'var(--button-shadow)',
-  cursor: 'pointer',
-  display: 'flex',
-  alignItems: 'center',
-};
+const MotionAnchor = motion.a;
+const MotionNav = motion.nav;
 
 const socialLinks = [
   { href: 'https://github.com/AdithyaDevi3', icon: FaGithub, label: 'GitHub', target: '_blank' },
@@ -22,33 +13,29 @@ const socialLinks = [
 ];
 
 function SocialLinks() {
+  const reduceMotion = useReducedMotion();
+
   return (
-    <div style={{ position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)', zIndex: layout.zOverlay, display: 'flex', gap: 12, pointerEvents: 'auto' }}>
-      {socialLinks.map(({ href, icon, label, target }) => (
-        <a
+    <MotionNav className="social-dock" aria-label="Social links">
+      {socialLinks.map(({ href, icon, label, target }, index) => (
+        <MotionAnchor
           key={label}
           href={href}
           target={target}
           aria-label={label}
           rel={target ? 'noopener noreferrer' : undefined}
-          style={linkStyle}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'var(--button-bg-hover)';
-            e.currentTarget.style.borderColor = 'var(--button-border-hover)';
-            e.currentTarget.style.boxShadow = 'var(--button-shadow-hover)';
-            e.currentTarget.style.transform = 'translateY(-1px)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'var(--button-bg)';
-            e.currentTarget.style.borderColor = 'var(--button-border)';
-            e.currentTarget.style.boxShadow = 'var(--button-shadow)';
-            e.currentTarget.style.transform = 'translateY(0)';
-          }}
+          className="social-dock-link"
+          initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 16, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          whileHover={reduceMotion ? undefined : { y: -5, rotate: index === 1 ? 0 : index === 0 ? -2 : 2 }}
+          whileTap={reduceMotion ? undefined : { scale: 0.9 }}
+          transition={{ ...motionSpring, delay: reduceMotion ? 0 : sequenceDelay(index, 0.07, 0.42) }}
         >
           {createElement(icon, { size: 26 })}
-        </a>
+          <span>{label}</span>
+        </MotionAnchor>
       ))}
-    </div>
+    </MotionNav>
   );
 }
 
