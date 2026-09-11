@@ -19,6 +19,7 @@ Before submitting a change:
 
 ```bash
 npm run lint
+npm test
 npm run build
 ```
 
@@ -39,7 +40,15 @@ Changes are developed on focused feature branches and merged into `main` through
 
 ## Next improvements
 
-- Add automated interaction and accessibility coverage for the campaign map and project cards.
+- Expand automated browser interaction and accessibility coverage for the campaign map and project cards.
 - Continue responsive testing and mobile layout refinement.
 - Split the large production JavaScript bundle and defer noncritical 3D code.
 - Keep project descriptions and résumé content current.
+
+## Motion acceptance checks
+
+- Route, page, card, and modal transitions preserve context instead of flashing between states.
+- Hover motion is subtle, directional, and paired with an equivalent keyboard focus state.
+- `prefers-reduced-motion` removes continuous decorative movement and shortens state transitions.
+- Signal animation math remains bounded and deterministic under `npm test`.
+- Desktop and mobile review must confirm legibility, stable layout, and smooth interaction before deployment.
