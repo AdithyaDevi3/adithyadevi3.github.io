@@ -21,7 +21,7 @@ function CrystalBackground() {
     camera.position.set(0, 0, 10);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.8));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -93,7 +93,7 @@ function CrystalBackground() {
       edge.energyPulse = 0;
     });
 
-    const particleCount = 4400;
+    const particleCount = 2800;
     const particlePositions = new Float32Array(particleCount * 3);
     const particleColors = new Float32Array(particleCount * 3);
     const particleAlphas = new Float32Array(particleCount);
@@ -359,14 +359,26 @@ function CrystalBackground() {
     }
 
     const buildDuration = 15000;
-    const buildTargetCount = 3500;
+    const buildTargetCount = 2200;
     let lastFrameTime = performance.now();
     let elapsed = 0;
     let time = 0;
     let spawned = 0;
+    let animationFrameId = null;
+    let isDisposed = false;
+    const animatedEdgeStart = new THREE.Vector3();
+    const animatedEdgeEnd = new THREE.Vector3();
+    const edgeMidpoint = new THREE.Vector3();
+
+    function scheduleNextFrame() {
+      if (!isDisposed && !document.hidden && animationFrameId === null) {
+        animationFrameId = requestAnimationFrame(animate);
+      }
+    }
 
     function animate() {
-      requestAnimationFrame(animate);
+      animationFrameId = null;
+      if (isDisposed || document.hidden) return;
       const now = performance.now();
       const frameDelta = Math.min(64, now - lastFrameTime);
       lastFrameTime = now;
@@ -510,12 +522,12 @@ function CrystalBackground() {
           const p1 = controlPos;
           const p2 = endPos;
           
-          const newStart = new THREE.Vector3()
+          const newStart = animatedEdgeStart
             .copy(p0).multiplyScalar((1 - eased) * (1 - eased))
             .addScaledVector(p1, 2 * (1 - eased) * eased)
             .addScaledVector(p2, eased * eased);
           
-          const newEnd = new THREE.Vector3()
+          const newEnd = animatedEdgeEnd
             .copy(p1).multiplyScalar((1 - eased) * (1 - eased))
             .addScaledVector(p2, 2 * (1 - eased) * eased)
             .addScaledVector(controlPos, eased * eased);
@@ -543,7 +555,7 @@ function CrystalBackground() {
           edge.line.material.opacity = 0.8;
         }
         
-        const midpoint = new THREE.Vector3().lerpVectors(edge.atom1.position, edge.atom2.position, 0.5);
+        const midpoint = edgeMidpoint.lerpVectors(edge.atom1.position, edge.atom2.position, 0.5);
         edge.energy = Math.max(0, edge.energy - 0.015);
         edge.energyPulse = Math.max(0, edge.energyPulse - 0.03);
         const color = getSpatialGradientColor(midpoint, index);
@@ -555,9 +567,10 @@ function CrystalBackground() {
       trailMaterial.uniforms.uTime.value = time;
 
       renderer.render(scene, camera);
+      scheduleNextFrame();
     }
 
-    animate();
+    scheduleNextFrame();
 
     function handleResize() {
       camera.aspect = window.innerWidth / window.innerHeight;
@@ -565,10 +578,25 @@ function CrystalBackground() {
       renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
+    function handleVisibilityChange() {
+      if (document.hidden) {
+        if (animationFrameId !== null) cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+        return;
+      }
+
+      lastFrameTime = performance.now();
+      scheduleNextFrame();
+    }
+
     window.addEventListener('resize', handleResize);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
+      isDisposed = true;
+      if (animationFrameId !== null) cancelAnimationFrame(animationFrameId);
       window.removeEventListener('resize', handleResize);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       renderer.domElement.removeEventListener('mousedown', onMouseDown);
       renderer.domElement.removeEventListener('mousemove', onMouseMove);
       renderer.domElement.removeEventListener('mouseup', onMouseUp);
@@ -589,6 +617,10 @@ function CrystalBackground() {
       trailGeometry.dispose();
       particleMaterial.dispose();
       trailMaterial.dispose();
+      renderer.renderLists.dispose();
+      renderer.dispose();
+      renderer.forceContextLoss();
+      scene.clear();
     };
   }, []);
 
