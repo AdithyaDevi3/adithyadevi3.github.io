@@ -22,6 +22,7 @@ function UnifiedGalaxy() {
     camera.position.z = 20;
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -57,13 +58,23 @@ function UnifiedGalaxy() {
     const testBox = new THREE.Mesh(boxGeometry, boxMaterial);
     scene.add(testBox);
 
-    // Animation loop
-    const animationLoop = () => {
-      renderer.render(scene, camera);
-      frameIdRef.current = requestAnimationFrame(animationLoop);
+    let isDisposed = false;
+
+    const scheduleNextFrame = () => {
+      if (!isDisposed && !document.hidden && frameIdRef.current === null) {
+        frameIdRef.current = requestAnimationFrame(animationLoop);
+      }
     };
 
-    frameIdRef.current = requestAnimationFrame(animationLoop);
+    // Animation loop
+    const animationLoop = () => {
+      frameIdRef.current = null;
+      if (isDisposed || document.hidden) return;
+      renderer.render(scene, camera);
+      scheduleNextFrame();
+    };
+
+    scheduleNextFrame();
 
     // Handle resize
     const handleResize = () => {
@@ -73,10 +84,29 @@ function UnifiedGalaxy() {
     };
     window.addEventListener('resize', handleResize);
 
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        if (frameIdRef.current !== null) cancelAnimationFrame(frameIdRef.current);
+        frameIdRef.current = null;
+        return;
+      }
+      scheduleNextFrame();
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
+      isDisposed = true;
       window.removeEventListener('resize', handleResize);
-      if (frameIdRef.current) cancelAnimationFrame(frameIdRef.current);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (frameIdRef.current !== null) cancelAnimationFrame(frameIdRef.current);
+      greenGeometry.dispose();
+      greenMaterial.dispose();
+      boxGeometry.dispose();
+      boxMaterial.dispose();
+      renderer.renderLists.dispose();
       renderer.dispose();
+      renderer.forceContextLoss();
+      scene.clear();
       if (renderer.domElement.parentNode === container) {
         container.removeChild(renderer.domElement);
       }

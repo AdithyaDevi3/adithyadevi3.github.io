@@ -75,7 +75,8 @@ export default function ObjectModal({ item, onClose }) {
 
   // Fade in
   useEffect(() => {
-    requestAnimationFrame(() => setVisible(true));
+    const frameId = requestAnimationFrame(() => setVisible(true));
+    return () => cancelAnimationFrame(frameId);
   }, []);
 
   // Close on Escape

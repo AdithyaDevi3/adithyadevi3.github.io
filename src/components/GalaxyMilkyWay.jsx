@@ -201,7 +201,10 @@ export default function GalaxyMilkyWay({ onClose, onObjectSelect }) {
   const [visible, setVisible]  = useState(false);
 
   // Fade-in on mount
-  useEffect(() => { requestAnimationFrame(() => setVisible(true)); }, []);
+  useEffect(() => {
+    const frameId = requestAnimationFrame(() => setVisible(true));
+    return () => cancelAnimationFrame(frameId);
+  }, []);
 
   // Canvas resize
   useEffect(() => {

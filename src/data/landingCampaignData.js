@@ -15,46 +15,52 @@ export const landingCampaignBranches = [
         id: 'adobe',
         category: 'experience',
         name: 'Adobe',
-        title: 'Developer Platforms Intern',
+        title: 'Software Engineering Intern, Developer Platforms',
         period: 'Summer 2026',
+        location: 'San Jose, CA',
         logo: adobeLogo,
         color: '#d36a5f',
-        summary: 'Developer tooling and platform experience work across product and engineering workflows.',
+        summary: 'Built security and reliability tooling for Kubernetes operations at enterprise scale.',
         details: [
-          'Exploring platform workflows that make developer onboarding and day-to-day shipping clearer.',
-          'Working across APIs, product thinking, and internal tooling for developer experience.'
+          'Built dashboards to surface security tickets for cluster health and reliability, covering 100,000+ tickets.',
+          'Developed a RAG-based chatbot with NLP capabilities for natural language querying of JIRA tickets.',
+          'Built Kubernetes outage reporting for clusters below 99.999% availability across 42+ tenant teams.'
         ],
-        skills: ['Developer Platforms', 'APIs', 'Systems Design']
+        skills: ['React', 'D3', 'Kubernetes', 'Docker', 'Python', 'AWS', 'Postgres', 'Claude Code', 'Codex']
       },
       {
         id: 'ncr',
         category: 'experience',
         name: 'NCR Voyix',
-        title: 'Mobile Development Intern',
-        period: 'Summer 2025',
+        title: 'Software Engineering Intern, Mobile Development',
+        period: 'May 2025 – August 2025',
+        location: 'Atlanta, GA',
         logo: ncrLogo,
         color: '#668fbd',
-        summary: 'Built mobile systems for retail operations and connected commerce experiences.',
+        summary: 'Built a cross-platform e-commerce loyalty experience across mobile, web, and kiosks.',
         details: [
-          'Shipped polished mobile workflows for in-store operational teams.',
-          'Connected app flows to commerce data with resilient integration patterns.'
+          'Developed a full-stack e-commerce loyalty platform for all-inclusive ordering using React Native and GraphQL.',
+          'Integrated a GraphQL API into a React Native frontend for an e-commerce mobile application with 20+ screens.',
+          'Deployed the app across iOS, Android, web, and kiosks via a single shared codebase for 4 platforms.'
         ],
-        skills: ['React Native', 'Expo', 'GraphQL', 'TypeScript']
+        skills: ['React Native', 'React', 'GraphQL', 'Expo']
       },
       {
         id: 'novae',
         category: 'experience',
         name: 'Novae',
         title: 'Software Engineering Intern',
-        period: 'Summer 2024',
+        period: 'June 2024 – July 2024',
+        location: 'Markle, IN',
         logo: novaeLogo,
         color: '#75a47f',
-        summary: 'Contributed to event-driven systems and modern web interfaces for product operations.',
+        summary: 'Built a real-time log analytics pipeline processing more than one million logs.',
         details: [
-          'Improved message-driven services and monitoring around streaming workflows.',
-          'Built cleaner admin surfaces for internal operational use.'
+          'Built a real-time analytics tool with Spring Boot and Kafka to parse 1M+ logs and stream to consumers.',
+          'Consumed Kafka streams and persisted results to MongoDB via a Spring-based consumer.',
+          'Implemented trend analysis, outlier detection, and log search, reducing search time by 350% on average.'
         ],
-        skills: ['Spring Boot', 'Angular', 'Kafka', 'MongoDB']
+        skills: ['Spring Boot', 'Angular', 'MongoDB', 'Chart.js', 'Kafka']
       },
       {
         id: 'curo',

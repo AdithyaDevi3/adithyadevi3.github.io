@@ -239,8 +239,12 @@ function ProjectFlipCard({ item, index }) {
         return response.text();
       })
       .then((markdown) => setSummary(readmeSummary(markdown, item.summary)))
-      .catch(() => setSummary(item.summary))
-      .finally(() => setIsLoading(false));
+      .catch((error) => {
+        if (error.name !== 'AbortError') setSummary(item.summary);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setIsLoading(false);
+      });
 
     return () => controller.abort();
   }, [item.readmeUrl, item.summary]);
@@ -373,7 +377,7 @@ function CampaignTreeScreen({ target, branches, selectedNodeId, onBack, onSelect
                     </span>
                     <span className="campaign-mission-copy">
                       <strong>{item.name}</strong>
-                      <span>{item.title}</span>
+                      <span>{[item.title, item.location].filter(Boolean).join(' · ')}</span>
                       <small>{item.summary}</small>
                     </span>
                   </MotionButton>
