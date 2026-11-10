@@ -23,6 +23,7 @@ function CubeBackground() {
     camera.position.z = 10;
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     renderer.setSize(window.innerWidth, window.innerHeight);
     const mountEl = mountRef.current;
     mountEl.appendChild(renderer.domElement);
@@ -234,9 +235,18 @@ function CubeBackground() {
     // Pre-calculate normalized indices for performance
     const atomNormalizedIndices = atoms.map((_, i) => i / atoms.length);
     const edgeNormalizedIndices = edgeLines.map((_, i) => i / edgeLines.length);
+    let animationFrameId = null;
+    let isDisposed = false;
+
+    function scheduleNextFrame() {
+      if (!isDisposed && !document.hidden && animationFrameId === null) {
+        animationFrameId = requestAnimationFrame(animate);
+      }
+    }
 
     function animate() {
-      requestAnimationFrame(animate);
+      animationFrameId = null;
+      if (isDisposed || document.hidden) return;
 
       const elapsed = Date.now() - startTime;
       animationProgress = Math.min(elapsed / buildDuration, 1);
@@ -304,9 +314,10 @@ function CubeBackground() {
       }
 
       renderer.render(scene, camera);
+      scheduleNextFrame();
     }
 
-    animate();
+    scheduleNextFrame();
 
     function handleResize() {
       camera.aspect = window.innerWidth / window.innerHeight;
@@ -314,10 +325,23 @@ function CubeBackground() {
       renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
+    function handleVisibilityChange() {
+      if (document.hidden) {
+        if (animationFrameId !== null) cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+        return;
+      }
+      scheduleNextFrame();
+    }
+
     window.addEventListener('resize', handleResize);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
+      isDisposed = true;
+      if (animationFrameId !== null) cancelAnimationFrame(animationFrameId);
       window.removeEventListener('resize', handleResize);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       renderer.domElement.removeEventListener('mousedown', onMouseDown);
       renderer.domElement.removeEventListener('mousemove', onMouseMove);
       renderer.domElement.removeEventListener('mouseup', onMouseUp);
@@ -334,6 +358,11 @@ function CubeBackground() {
         edge.line.geometry.dispose();
         edge.line.material.dispose();
       });
+      renderer.renderLists.dispose();
+      renderer.dispose();
+      renderer.forceContextLoss();
+      scene.clear();
+      sceneRef.current = null;
     };
   }, []);
 

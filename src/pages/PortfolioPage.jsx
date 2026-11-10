@@ -38,7 +38,7 @@ function PortfolioPage() {
           💼 {selectedEntry.title}
         </p>
         <p style={{ margin: '0 0 16px 0', fontSize: 12, color: '#7bb8d9' }}>
-          📅 {selectedEntry.period}
+          📅 {[selectedEntry.period, selectedEntry.location].filter(Boolean).join(' · ')}
         </p>
         <p style={{ margin: '0 0 12px 0', fontSize: 13, lineHeight: 1.6, color: '#cbd5e1' }}>
           {selectedEntry.summary}

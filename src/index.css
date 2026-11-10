@@ -1359,8 +1359,8 @@ main, body {
 
 .campaign-modal-shell {
   position: relative;
-  width: min(440px, 92vw);
-  min-height: 520px;
+  width: min(520px, 92vw);
+  min-height: 620px;
   perspective: 1200px;
   transform-style: preserve-3d;
 }
@@ -1430,12 +1430,12 @@ main, body {
 
 .campaign-card-stage {
   position: relative;
-  min-height: 520px;
+  min-height: 620px;
 }
 
 .campaign-flip-card {
   width: 100%;
-  min-height: 520px;
+  min-height: 620px;
   border: 0;
   padding: 0;
   background: transparent;
@@ -1448,7 +1448,7 @@ main, body {
   position: relative;
   display: block;
   width: 100%;
-  min-height: 520px;
+  min-height: 620px;
   transform-style: preserve-3d;
 }
 
@@ -1502,8 +1502,10 @@ main, body {
 .campaign-card-face--back {
   transform: rotateY(180deg);
   align-items: stretch;
+  justify-content: flex-start;
   padding-bottom: 88px;
   text-align: left;
+  overflow-y: auto;
 }
 
 .campaign-card-logo {

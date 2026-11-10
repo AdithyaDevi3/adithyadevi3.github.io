@@ -90,12 +90,12 @@ export default function CampaignCardModal({ item, onClose }) {
                   <span className="campaign-card-kicker">{item.branchLabel || item.category}</span>
                   <strong>{item.name}</strong>
                   <span>{item.title}</span>
-                  <small>{item.period}</small>
+                  <small>{[item.period, item.location].filter(Boolean).join(' · ')}</small>
                   <em>Press to reveal details</em>
                 </span>
 
                 <span className="campaign-card-face campaign-card-face--back" aria-hidden={!flipped}>
-                  <span className="campaign-card-kicker">{item.period}</span>
+                  <span className="campaign-card-kicker">{[item.period, item.location].filter(Boolean).join(' · ')}</span>
                   <strong>{item.title}</strong>
                   <span className="campaign-card-summary">{item.summary}</span>
                   <span className="campaign-card-details">
