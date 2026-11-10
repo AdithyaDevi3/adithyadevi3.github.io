@@ -1,31 +1,43 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import * as THREE from 'three';
 import { landingCampaignBranches } from '../data/landingCampaignData';
+import {
+  motionDuration,
+  motionEase,
+  motionSpring,
+  motionSpringSoft,
+  sequenceDelay
+} from '../motion';
 
+const MotionAnchor = motion.a;
+const MotionArticle = motion.article;
+const MotionButton = motion.button;
 const MotionDiv = motion.div;
+const MotionHeader = motion.header;
+const MotionSection = motion.section;
 
-const routeDefinitions = {
-  left: {
-    color: '#2563eb',
-    points: [
-      [0, -1.2, 0.55],
-      [-1.2, -1.34, -1.4],
-      [-2.9, -0.66, -3.8],
-      [-4.7, 0.16, -6.8]
-    ]
-  },
-  right: {
-    color: '#2563eb',
-    points: [
-      [0, -1.2, 0.55],
-      [1.2, -1.32, -1.4],
-      [3.1, -0.56, -3.8],
-      [4.9, 0.22, -6.8]
-    ]
-  }
+const rocketColors = {
+  shell: '#edf1ec',
+  shellShadow: '#9fb3b7',
+  red: '#ef482f',
+  redShadow: '#b92f28',
+  teal: '#278fa3',
+  glass: '#39c6dc',
+  glassRim: '#d98a20',
+  flame: '#f06423',
+  flameCore: '#ffd447'
 };
+
+const rocketBodyProfile = [
+  new THREE.Vector2(0.13, -0.5),
+  new THREE.Vector2(0.19, -0.36),
+  new THREE.Vector2(0.235, -0.05),
+  new THREE.Vector2(0.225, 0.16),
+  new THREE.Vector2(0.18, 0.36),
+  new THREE.Vector2(0.11, 0.5)
+];
 
 const navigationTargets = [
   {
@@ -48,97 +60,128 @@ const navigationTargets = [
   }
 ];
 
-function createCurve(points) {
-  return new THREE.CatmullRomCurve3(points.map(([x, y, z]) => new THREE.Vector3(x, y, z)));
-}
-
-function RouteLine({ route, active }) {
-  const curve = useMemo(() => createCurve(route.points), [route.points]);
-  const glowGeometry = useMemo(() => new THREE.TubeGeometry(curve, 96, 0.045, 10, false), [curve]);
-  const coreGeometry = useMemo(() => new THREE.TubeGeometry(curve, 96, 0.014, 8, false), [curve]);
-
-  return (
-    <group>
-      <mesh geometry={glowGeometry}>
-        <meshBasicMaterial color={route.color} transparent opacity={active ? 0.28 : 0.14} />
-      </mesh>
-      <mesh geometry={coreGeometry}>
-        <meshBasicMaterial color={route.color} transparent opacity={active ? 0.9 : 0.58} />
-      </mesh>
-    </group>
-  );
-}
-
-function RocketNavigator({ activeRouteId }) {
+function RocketNavigator({ reduceMotion }) {
   const rocketRef = useRef(null);
   const flameRef = useRef(null);
-  const curves = useMemo(() => ({
-    left: createCurve(routeDefinitions.left.points),
-    right: createCurve(routeDefinitions.right.points)
-  }), []);
+  const pointerRef = useRef({ x: 0, y: 0, active: false });
+  const pointerWorldRef = useRef(new THREE.Vector3());
+  const pointerDirectionRef = useRef(new THREE.Vector3());
+  const targetRef = useRef(new THREE.Vector3(0, -0.35, 0.55));
 
-  useFrame(({ clock }) => {
+  useEffect(() => {
+    const handlePointerMove = (event) => {
+      if (event.pointerType === 'touch') return;
+      pointerRef.current.x = (event.clientX / window.innerWidth) * 2 - 1;
+      pointerRef.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
+      pointerRef.current.active = true;
+    };
+    const handlePointerLeave = () => {
+      pointerRef.current.active = false;
+    };
+
+    window.addEventListener('pointermove', handlePointerMove, { passive: true });
+    window.addEventListener('blur', handlePointerLeave);
+    document.documentElement.addEventListener('mouseleave', handlePointerLeave);
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('blur', handlePointerLeave);
+      document.documentElement.removeEventListener('mouseleave', handlePointerLeave);
+    };
+  }, []);
+
+  useFrame(({ camera, clock }, delta) => {
     if (!rocketRef.current) return;
-    const routeId = activeRouteId || (Math.sin(clock.elapsedTime * 0.5) > 0 ? 'right' : 'left');
-    const curve = curves[routeId];
-    const destination = activeRouteId ? 0.72 : 0.18 + Math.sin(clock.elapsedTime * 0.65) * 0.045;
-    const progress = THREE.MathUtils.clamp(destination, 0.08, 0.94);
-    const point = curve.getPointAt(progress);
-    const next = curve.getPointAt((progress + 0.01) % 1);
-    rocketRef.current.position.lerp(point, 0.085);
-    rocketRef.current.lookAt(next);
-    rocketRef.current.rotation.z += Math.PI / 2;
-    rocketRef.current.position.y += Math.sin(clock.elapsedTime * 3.1) * 0.035;
+    const pointer = pointerRef.current;
+    const target = targetRef.current;
+
+    if (pointer.active) {
+      const pointerWorld = pointerWorldRef.current.set(pointer.x, pointer.y, 0.5).unproject(camera);
+      const direction = pointerDirectionRef.current.copy(pointerWorld).sub(camera.position).normalize();
+      const distance = (0.55 - camera.position.z) / direction.z;
+      target.copy(camera.position).addScaledVector(direction, distance);
+      target.x = THREE.MathUtils.clamp(target.x, -4.7, 4.7);
+      target.y = THREE.MathUtils.clamp(target.y, -2.65, 2.75);
+      target.z = 0.55;
+    } else {
+      target.set(
+        reduceMotion ? 0 : Math.sin(clock.elapsedTime * 0.55) * 0.45,
+        -0.35 + (reduceMotion ? 0 : Math.cos(clock.elapsedTime * 0.7) * 0.12),
+        0.55
+      );
+    }
+
+    const rocket = rocketRef.current;
+    const previousX = rocket.position.x;
+    const previousY = rocket.position.y;
+    const followSpeed = reduceMotion ? 12 : 7;
+    rocket.position.x = THREE.MathUtils.damp(rocket.position.x, target.x, followSpeed, delta);
+    rocket.position.y = THREE.MathUtils.damp(rocket.position.y, target.y, followSpeed, delta);
+    rocket.position.z = THREE.MathUtils.damp(rocket.position.z, target.z, followSpeed, delta);
+
+    const velocityX = rocket.position.x - previousX;
+    const velocityY = rocket.position.y - previousY;
+    if (Math.abs(velocityX) + Math.abs(velocityY) > 0.0001) {
+      const desiredRotation = Math.atan2(velocityY, velocityX);
+      const angleDelta = Math.atan2(
+        Math.sin(desiredRotation - rocket.rotation.z),
+        Math.cos(desiredRotation - rocket.rotation.z)
+      );
+      rocket.rotation.z += angleDelta * (1 - Math.exp(-10 * delta));
+    }
 
     if (flameRef.current) {
-      const pulse = 1 + Math.sin(clock.elapsedTime * 18) * 0.2;
-      flameRef.current.scale.set(0.85 * pulse, 1.15 + pulse * 0.18, 0.85 * pulse);
+      const pulse = reduceMotion ? 1 : 1 + Math.sin(clock.elapsedTime * 16) * 0.12;
+      flameRef.current.scale.set(0.88 * pulse, 1.1 + pulse * 0.12, 0.88 * pulse);
     }
   });
 
   return (
-    <group ref={rocketRef} scale={0.78}>
-      <mesh rotation={[0, 0, -Math.PI / 2]} position={[0.52, 0, 0]}>
-        <coneGeometry args={[0.235, 0.48, 32]} />
-        <meshStandardMaterial color="#e2e8f0" roughness={0.36} metalness={0.28} />
+    <group ref={rocketRef} position={[0, -0.35, 0.55]} scale={0.64}>
+      <mesh rotation={[0, 0, -Math.PI / 2]} position={[0.54, 0, 0]}>
+        <coneGeometry args={[0.22, 0.5, 32]} />
+        <meshStandardMaterial color={rocketColors.red} roughness={0.36} metalness={0.12} />
       </mesh>
-      <mesh rotation={[0, 0, Math.PI / 2]} position={[-0.08, 0, 0]}>
-        <capsuleGeometry args={[0.22, 0.86, 12, 24]} />
-        <meshStandardMaterial color="#f8fafc" roughness={0.32} metalness={0.22} />
+      <mesh rotation={[0, 0, -Math.PI / 2]} position={[-0.08, 0, 0]} scale={[1, 1, 0.9]}>
+        <latheGeometry args={[rocketBodyProfile, 48]} />
+        <meshStandardMaterial color={rocketColors.shell} roughness={0.42} metalness={0.08} />
       </mesh>
-      <mesh rotation={[0, Math.PI / 2, 0]} position={[0.28, 0, 0]}>
-        <cylinderGeometry args={[0.232, 0.232, 0.1, 32]} />
-        <meshStandardMaterial color="#d36a5f" roughness={0.4} metalness={0.2} />
+      <mesh rotation={[0, 0, Math.PI / 2]} position={[0.25, 0, 0]}>
+        <cylinderGeometry args={[0.19, 0.205, 0.09, 32]} />
+        <meshStandardMaterial color={rocketColors.shellShadow} roughness={0.42} metalness={0.16} />
       </mesh>
-      <mesh position={[0.1, 0.225, 0.11]}>
-        <sphereGeometry args={[0.105, 24, 24]} />
-        <meshStandardMaterial color="#0f3b66" emissive="#2563eb" emissiveIntensity={0.16} roughness={0.12} metalness={0.62} />
+      <mesh position={[0.08, 0, 0.225]}>
+        <circleGeometry args={[0.105, 32]} />
+        <meshStandardMaterial color={rocketColors.glass} emissive={rocketColors.glass} emissiveIntensity={0.16} roughness={0.16} metalness={0.24} />
       </mesh>
-      <mesh position={[-0.44, 0.24, 0]} rotation={[0, 0, -0.62]}>
-        <coneGeometry args={[0.13, 0.42, 3]} />
-        <meshStandardMaterial color="#d36a5f" roughness={0.42} metalness={0.16} />
+      <mesh position={[0.08, 0, 0.23]}>
+        <torusGeometry args={[0.112, 0.018, 12, 32]} />
+        <meshStandardMaterial color={rocketColors.glassRim} roughness={0.34} metalness={0.28} />
       </mesh>
-      <mesh position={[-0.44, -0.24, 0]} rotation={[0, 0, 0.62]}>
-        <coneGeometry args={[0.13, 0.42, 3]} />
-        <meshStandardMaterial color="#d36a5f" roughness={0.42} metalness={0.16} />
+      <mesh position={[-0.43, 0.22, 0]} rotation={[0, 0, -0.62]}>
+        <coneGeometry args={[0.12, 0.38, 3]} />
+        <meshStandardMaterial color={rocketColors.red} roughness={0.4} metalness={0.08} />
       </mesh>
-      <mesh rotation={[0, 0, Math.PI / 2]} position={[-0.68, 0, 0]}>
-        <cylinderGeometry args={[0.16, 0.11, 0.18, 24]} />
-        <meshStandardMaterial color="#475569" roughness={0.34} metalness={0.72} />
+      <mesh position={[-0.43, -0.22, 0]} rotation={[0, 0, 0.62]}>
+        <coneGeometry args={[0.12, 0.38, 3]} />
+        <meshStandardMaterial color={rocketColors.redShadow} roughness={0.4} metalness={0.08} />
       </mesh>
-      <mesh ref={flameRef} position={[-0.84, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-        <coneGeometry args={[0.13, 0.42, 24]} />
-        <meshBasicMaterial color="#fbbf24" transparent opacity={0.82} />
+      <mesh rotation={[0, 0, Math.PI / 2]} position={[-0.66, 0, 0]}>
+        <cylinderGeometry args={[0.155, 0.105, 0.18, 24]} />
+        <meshStandardMaterial color={rocketColors.teal} roughness={0.34} metalness={0.38} />
       </mesh>
-      <mesh position={[-0.96, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-        <coneGeometry args={[0.07, 0.28, 20]} />
-        <meshBasicMaterial color="#fb7185" transparent opacity={0.5} />
+      <mesh ref={flameRef} position={[-0.83, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <coneGeometry args={[0.12, 0.38, 24]} />
+        <meshBasicMaterial color={rocketColors.flame} transparent opacity={0.88} />
+      </mesh>
+      <mesh position={[-0.94, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <coneGeometry args={[0.06, 0.24, 20]} />
+        <meshBasicMaterial color={rocketColors.flameCore} transparent opacity={0.78} />
       </mesh>
     </group>
   );
 }
 
-function CampaignPathScene({ activeRouteId }) {
+function CampaignPathScene({ reduceMotion }) {
   return (
     <Canvas
       className="campaign-map-canvas"
@@ -148,16 +191,8 @@ function CampaignPathScene({ activeRouteId }) {
     >
       <ambientLight intensity={0.82} />
       <pointLight position={[0, 2.2, 2]} intensity={2.15} color="#ffffff" />
-      <pointLight position={[3, 0.5, -3]} intensity={1.25} color="#2563eb" />
-      {Object.entries(routeDefinitions).map(([id, route]) => {
-        const active = activeRouteId === id;
-        return (
-          <group key={id}>
-            <RouteLine route={route} active={active} />
-          </group>
-        );
-      })}
-      <RocketNavigator activeRouteId={activeRouteId} />
+      <pointLight position={[3, 0.5, -3]} intensity={1.05} color="#60a5fa" />
+      <RocketNavigator reduceMotion={reduceMotion} />
     </Canvas>
   );
 }
@@ -187,10 +222,11 @@ function readmeSummary(markdown, fallback) {
   return plainText.length > 360 ? `${plainText.slice(0, 357)}...` : plainText;
 }
 
-function ProjectFlipCard({ item }) {
+function ProjectFlipCard({ item, index }) {
   const [flipped, setFlipped] = useState(false);
   const [summary, setSummary] = useState(item.summary);
   const [isLoading, setIsLoading] = useState(Boolean(item.readmeUrl));
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     const controller = new AbortController();
@@ -210,86 +246,125 @@ function ProjectFlipCard({ item }) {
   }, [item.readmeUrl, item.summary]);
 
   return (
-    <article
+    <MotionArticle
       className={`project-flip-card ${flipped ? 'project-flip-card--flipped' : ''}`}
+      initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 18, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      whileHover={reduceMotion ? undefined : { y: -6 }}
+      transition={{ ...motionSpringSoft, delay: reduceMotion ? 0 : sequenceDelay(index, 0.045, 0.12) }}
     >
-      <button
+      <MotionButton
         type="button"
         className="project-flip-card-toggle"
         aria-expanded={flipped}
         aria-label={`${flipped ? 'Hide' : 'Show'} README summary for ${item.name}`}
         onClick={() => setFlipped((value) => !value)}
+        whileTap={reduceMotion ? undefined : { scale: 0.985 }}
       >
-        <div className="project-flip-card-inner">
+        <MotionDiv
+          className="project-flip-card-inner"
+          animate={{ rotateY: reduceMotion ? 0 : flipped ? 180 : 0 }}
+          transition={reduceMotion ? { duration: 0.01 } : { ...motionSpring, stiffness: 190, damping: 24 }}
+        >
           <div className="project-flip-face project-flip-face--front" aria-hidden={flipped}>
             <span>Project</span>
             <strong>{item.name}</strong>
             <small>{item.skills.join(' · ')}</small>
-            <em>Click for README</em>
+            <em><i className="project-card-signal" /> Explore README</em>
           </div>
           <div className="project-flip-face project-flip-face--back" aria-hidden={!flipped}>
             <span>README</span>
             <p>{isLoading ? 'Loading project README…' : summary}</p>
             <em>Click card to return</em>
           </div>
-        </div>
-      </button>
-      <a
+        </MotionDiv>
+      </MotionButton>
+      <MotionAnchor
         className="project-flip-card-link"
         href={item.repoUrl}
         target="_blank"
         rel="noreferrer"
         tabIndex={flipped ? 0 : -1}
         aria-hidden={!flipped}
+        animate={{ opacity: flipped ? 1 : 0, y: flipped ? 0 : 5 }}
+        whileHover={reduceMotion ? undefined : { x: 3 }}
+        transition={{ duration: reduceMotion ? 0.01 : motionDuration.fast, ease: motionEase }}
       >
         View repository ↗
-      </a>
-    </article>
+      </MotionAnchor>
+    </MotionArticle>
   );
 }
 
 function CampaignTreeScreen({ target, branches, selectedNodeId, onBack, onSelectNode }) {
+  const reduceMotion = useReducedMotion();
+  const direction = target.routeId === 'left' ? -1 : 1;
+
   return (
     <MotionDiv
       className={`campaign-tree-screen campaign-tree-screen--${target.routeId}`}
       style={{ '--node-color': target.color }}
-      initial={{ opacity: 0, y: 34, scale: 0.985 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: 24, scale: 0.985 }}
-      transition={{ duration: 0.48, ease: [0.22, 1, 0.36, 1] }}
+      initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: direction * 52, scale: 0.985 }}
+      animate={{ opacity: 1, x: 0, scale: 1 }}
+      exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: direction * -28, scale: 0.99 }}
+      transition={{ duration: reduceMotion ? 0.12 : motionDuration.slow, ease: motionEase }}
     >
       <div className="campaign-tree-screen-stars" aria-hidden="true" />
-      <header className="campaign-tree-screen-header">
-        <button type="button" onClick={onBack}>Back to rocket</button>
-        <span>{target.eyebrow}</span>
-        <h2>{target.label}</h2>
-        <p>{target.description}</p>
-      </header>
+      <MotionHeader
+        className="campaign-tree-screen-header"
+        initial={reduceMotion ? false : 'hidden'}
+        animate="visible"
+        variants={{
+          hidden: {},
+          visible: { transition: { staggerChildren: 0.065, delayChildren: 0.16 } }
+        }}
+      >
+        <MotionButton
+          type="button"
+          onClick={onBack}
+          variants={{ hidden: { opacity: 0, x: direction * 12 }, visible: { opacity: 1, x: 0 } }}
+          whileHover={reduceMotion ? undefined : { x: -4 }}
+          transition={motionSpring}
+        >
+          Back to rocket
+        </MotionButton>
+        <motion.span variants={{ hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0 } }}>{target.eyebrow}</motion.span>
+        <motion.h2 variants={{ hidden: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0 } }}>{target.label}</motion.h2>
+        <motion.p variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}>{target.description}</motion.p>
+      </MotionHeader>
 
       <div className="campaign-screen-map">
         {branches.map((branch, branchIndex) => (
-          <section
+          <MotionSection
             key={branch.id}
             className="campaign-screen-section"
             style={{ '--branch-color': branch.color, '--branch-index': branchIndex }}
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 26 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...motionSpringSoft, delay: reduceMotion ? 0 : sequenceDelay(branchIndex, 0.11, 0.22) }}
           >
             <div className="campaign-screen-section-title">
               <span>{branch.label}</span>
             </div>
             {branch.id === 'projects' ? (
               <div className="project-card-grid">
-                {branch.nodes.map((item) => <ProjectFlipCard key={item.id} item={item} />)}
+                {branch.nodes.map((item, itemIndex) => <ProjectFlipCard key={item.id} item={item} index={itemIndex} />)}
               </div>
             ) : <div className="campaign-mission-path">
               {branch.nodes.map((item, nodeIndex) => {
                 const isSelected = selectedNodeId === item.id;
                 return (
-                  <button
+                  <MotionButton
                     key={item.id}
                     type="button"
                     className={`campaign-mission-node ${isSelected ? 'campaign-mission-node--selected' : ''}`}
                     style={{ '--node-color': item.color, '--node-index': nodeIndex }}
                     onClick={() => onSelectNode(item, branch)}
+                    initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: direction * 18 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    whileHover={reduceMotion ? undefined : { x: direction * 6 }}
+                    whileTap={reduceMotion ? undefined : { scale: 0.99 }}
+                    transition={{ ...motionSpringSoft, delay: reduceMotion ? 0 : sequenceDelay(nodeIndex, 0.055, 0.28) }}
                   >
                     <span className="campaign-mission-orbit" aria-hidden="true">
                       <span className="campaign-node-logo campaign-mission-logo">
@@ -301,11 +376,11 @@ function CampaignTreeScreen({ target, branches, selectedNodeId, onBack, onSelect
                       <span>{item.title}</span>
                       <small>{item.summary}</small>
                     </span>
-                  </button>
+                  </MotionButton>
                 );
               })}
             </div>}
-          </section>
+          </MotionSection>
         ))}
       </div>
     </MotionDiv>
@@ -313,16 +388,15 @@ function CampaignTreeScreen({ target, branches, selectedNodeId, onBack, onSelect
 }
 
 export default function LandingCampaignMap({ selectedNodeId, onSelectNode }) {
-  const [activeRouteId, setActiveRouteId] = useState(null);
   const [activeTreeId, setActiveTreeId] = useState(null);
   const [viewState, setViewState] = useState('landing');
+  const reduceMotion = useReducedMotion();
   const activeTarget = navigationTargets.find((target) => target.id === activeTreeId);
   const visibleBranches = activeTarget
     ? landingCampaignBranches.filter((branch) => activeTarget.branchIds.includes(branch.id))
     : [];
 
   function selectTree(target) {
-    setActiveRouteId(target.routeId);
     setActiveTreeId(target.id);
     setViewState('tree');
   }
@@ -330,7 +404,6 @@ export default function LandingCampaignMap({ selectedNodeId, onSelectNode }) {
   function returnToLanding() {
     setViewState('landing');
     setActiveTreeId(null);
-    setActiveRouteId(null);
   }
 
   function selectNode(item, branch) {
@@ -344,37 +417,37 @@ export default function LandingCampaignMap({ selectedNodeId, onSelectNode }) {
 
   return (
     <section className="campaign-map" aria-label="Interactive career campaign map">
-      <CampaignPathScene activeRouteId={activeRouteId} />
+      <CampaignPathScene reduceMotion={reduceMotion} />
 
-      {viewState !== 'tree' && <div className="campaign-horizon" aria-hidden="true" />}
-
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="wait" initial={false}>
         {viewState === 'landing' && (
           <MotionDiv
             key="gate"
             className="campaign-gate"
             aria-label="Choose a path"
-            initial={{ opacity: 0, y: 16 }}
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -18 }}
-            transition={{ duration: 0.26 }}
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -12, scale: 0.99 }}
+            transition={{ duration: reduceMotion ? 0.12 : motionDuration.base, ease: motionEase }}
           >
-            {navigationTargets.map((target) => (
-              <button
+            {navigationTargets.map((target, index) => (
+              <MotionButton
                 key={target.id}
                 type="button"
                 className={`campaign-gate-card campaign-gate-card--${target.routeId}`}
                 style={{ '--node-color': target.color }}
-                onMouseEnter={() => setActiveRouteId(target.routeId)}
-                onMouseLeave={() => setActiveRouteId(null)}
-                onFocus={() => setActiveRouteId(target.routeId)}
-                onBlur={() => setActiveRouteId(null)}
                 onClick={() => selectTree(target)}
+                initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                whileHover={reduceMotion ? undefined : { y: -4 }}
+                whileTap={reduceMotion ? undefined : { scale: 0.985 }}
+                transition={{ ...motionSpringSoft, delay: reduceMotion ? 0 : sequenceDelay(index, 0.1, 0.18) }}
               >
                 <span>{target.eyebrow}</span>
                 <strong>{target.label}</strong>
                 <small>{target.description}</small>
-              </button>
+                <em>Explore <b>↗</b></em>
+              </MotionButton>
             ))}
           </MotionDiv>
         )}

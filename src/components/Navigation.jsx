@@ -1,34 +1,47 @@
-import { btn as btnStyle } from '../theme';
+import { motion, useReducedMotion } from 'framer-motion';
+import { motionSpring } from '../motion';
+
+const MotionButton = motion.button;
+const MotionNav = motion.nav;
 
 function Navigation({ route, setRoute }) {
+  const reduceMotion = useReducedMotion();
   const navButtons = [
     { label: 'Home', route: 'home', active: route === 'home' },
     { label: 'About', route: 'about', active: route === 'about' }
   ];
 
   return (
-    <div style={{ position: 'fixed', top: 16, right: 16, zIndex: 50, pointerEvents: 'none' }}>
-      <div style={{ pointerEvents: 'auto', display: 'flex', gap: 8 }}>
+    <MotionNav
+      className="site-navigation"
+      aria-label="Primary navigation"
+      initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ ...motionSpring, delay: reduceMotion ? 0 : 0.12 }}
+    >
+      <div className="site-navigation-track">
         {navButtons.map((item) => (
-          <button
+          <MotionButton
             key={item.route}
+            type="button"
+            className={`site-navigation-button ${item.active ? 'site-navigation-button--active' : ''}`}
             onClick={() => setRoute(item.route)}
-            style={{
-              ...btnStyle.base,
-              ...(item.active ? btnStyle.active : btnStyle.inactive),
-            }}
-            onMouseEnter={(e) => btnStyle.hoverEnter(e.currentTarget)}
-            onMouseLeave={(e) => {
-              // restore correct state on leave
-              const active = item.active;
-              Object.assign(e.currentTarget.style, active ? btnStyle.active : btnStyle.inactive);
-            }}
+            whileHover={reduceMotion ? undefined : { y: -2 }}
+            whileTap={reduceMotion ? undefined : { scale: 0.96 }}
+            transition={motionSpring}
           >
-            {item.label}
-          </button>
+            {item.active && (
+              <motion.span
+                className="site-navigation-active"
+                layoutId="site-navigation-active"
+                transition={motionSpring}
+              />
+            )}
+            <span>{item.label}</span>
+          </MotionButton>
         ))}
       </div>
-    </div>
+    </MotionNav>
   );
 }
 

@@ -15,12 +15,10 @@ function HomePage() {
         onSelectNode={setSelectedNode}
       />
 
-      {selectedNode && (
-        <CampaignCardModal
-          item={selectedNode}
-          onClose={() => setSelectedNode(null)}
-        />
-      )}
+      <CampaignCardModal
+        item={selectedNode}
+        onClose={() => setSelectedNode(null)}
+      />
     </>
   );
 }
