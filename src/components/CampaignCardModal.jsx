@@ -113,13 +113,18 @@ export default function CampaignCardModal({ item, onClose }) {
               </MotionSpan>
             </MotionButton>
 
-            {(item.repoUrl || item.readmeUrl) && (
+            {(item.liveUrl || item.repoUrl || item.readmeUrl) && (
               <MotionDiv
                 className="campaign-card-links"
                 aria-hidden={!flipped}
                 animate={{ opacity: flipped ? 1 : 0, y: flipped ? 0 : 8 }}
                 transition={{ duration: reduceMotion ? 0.01 : motionDuration.fast, ease: motionEase }}
               >
+                {item.liveUrl && (
+                  <MotionAnchor href={item.liveUrl} target="_blank" rel="noreferrer" tabIndex={flipped ? 0 : -1} whileHover={reduceMotion ? undefined : { x: 3 }}>
+                    {item.liveLabel || 'Open live site'}
+                  </MotionAnchor>
+                )}
                 {item.repoUrl && (
                   <MotionAnchor href={item.repoUrl} target="_blank" rel="noreferrer" tabIndex={flipped ? 0 : -1} whileHover={reduceMotion ? undefined : { x: 3 }}>
                     View on GitHub

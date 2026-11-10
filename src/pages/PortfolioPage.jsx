@@ -97,6 +97,11 @@ function PortfolioPage() {
                 </div>
                 <p style={{ margin: '4px 0 0 0', fontSize: 11, color: '#94a3b8' }}>{proj.summary}</p>
                 <div style={{ marginTop: 6, display: 'flex', gap: 8 }}>
+                  {proj.liveUrl && (
+                    <a href={proj.liveUrl} target="_blank" rel="noreferrer" style={{ color: '#66e8ff', fontSize: 12 }}>
+                      {proj.liveLabel || 'Live product'}
+                    </a>
+                  )}
                   {proj.repoUrl && (
                     <a href={proj.repoUrl} target="_blank" rel="noreferrer" style={{ color: '#66e8ff', fontSize: 12 }}>Repository</a>
                   )}

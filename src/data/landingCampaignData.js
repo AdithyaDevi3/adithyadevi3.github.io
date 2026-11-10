@@ -121,6 +121,8 @@ export const landingCampaignBranches = [
           'Includes small utilities to run and test solutions locally.'
         ],
         skills: ['TypeScript', 'Algorithms'],
+        liveUrl: 'https://corsair-tech-leetbot.vercel.app/',
+        liveLabel: 'Open LeetBot',
         repoUrl: 'https://github.com/AdithyaDevi3/Leetcode-App',
         readmeUrl: 'https://github.com/AdithyaDevi3/Leetcode-App/blob/main/README.md'
       },
@@ -274,6 +276,8 @@ export const landingCampaignBranches = [
           'Useful examples for quick prototypes.'
         ],
         skills: ['CSS', 'Design'],
+        liveUrl: 'https://adithyadevi3.github.io/landing-page/',
+        liveLabel: 'Open landing page',
         repoUrl: 'https://github.com/AdithyaDevi3/landing-page',
         readmeUrl: 'https://github.com/AdithyaDevi3/landing-page/blob/main/README.md'
       }
