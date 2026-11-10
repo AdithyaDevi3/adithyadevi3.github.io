@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import * as THREE from 'three';
@@ -8,8 +8,6 @@ import {
   motionEase,
   motionSpring,
   motionSpringSoft,
-  routeSignalProgress,
-  routeSignalScale,
   sequenceDelay
 } from '../motion';
 
@@ -20,26 +18,26 @@ const MotionDiv = motion.div;
 const MotionHeader = motion.header;
 const MotionSection = motion.section;
 
-const routeDefinitions = {
-  left: {
-    color: '#2563eb',
-    points: [
-      [0, -1.2, 0.55],
-      [-1.2, -1.34, -1.4],
-      [-2.9, -0.66, -3.8],
-      [-4.7, 0.16, -6.8]
-    ]
-  },
-  right: {
-    color: '#2563eb',
-    points: [
-      [0, -1.2, 0.55],
-      [1.2, -1.32, -1.4],
-      [3.1, -0.56, -3.8],
-      [4.9, 0.22, -6.8]
-    ]
-  }
+const rocketColors = {
+  shell: '#edf1ec',
+  shellShadow: '#9fb3b7',
+  red: '#ef482f',
+  redShadow: '#b92f28',
+  teal: '#278fa3',
+  glass: '#39c6dc',
+  glassRim: '#d98a20',
+  flame: '#f06423',
+  flameCore: '#ffd447'
 };
+
+const rocketBodyProfile = [
+  new THREE.Vector2(0.13, -0.5),
+  new THREE.Vector2(0.19, -0.36),
+  new THREE.Vector2(0.235, -0.05),
+  new THREE.Vector2(0.225, 0.16),
+  new THREE.Vector2(0.18, 0.36),
+  new THREE.Vector2(0.11, 0.5)
+];
 
 const navigationTargets = [
   {
@@ -62,176 +60,128 @@ const navigationTargets = [
   }
 ];
 
-function createCurve(points) {
-  return new THREE.CatmullRomCurve3(points.map(([x, y, z]) => new THREE.Vector3(x, y, z)));
-}
-
-function RouteLine({ route, active, reduceMotion }) {
-  const glowMaterialRef = useRef(null);
-  const coreMaterialRef = useRef(null);
-  const curve = useMemo(() => createCurve(route.points), [route.points]);
-  const glowGeometry = useMemo(() => new THREE.TubeGeometry(curve, 96, 0.045, 10, false), [curve]);
-  const coreGeometry = useMemo(() => new THREE.TubeGeometry(curve, 96, 0.014, 8, false), [curve]);
-
-  useFrame(({ clock }, delta) => {
-    const cadence = reduceMotion ? 0.62 : 0.62 + Math.sin(clock.elapsedTime * 1.35) * 0.12;
-    if (glowMaterialRef.current) {
-      const target = active ? 0.34 + cadence * 0.12 : 0.1 + cadence * 0.045;
-      glowMaterialRef.current.opacity = THREE.MathUtils.damp(glowMaterialRef.current.opacity, target, 5, delta);
-    }
-    if (coreMaterialRef.current) {
-      const target = active ? 0.88 + cadence * 0.1 : 0.42 + cadence * 0.08;
-      coreMaterialRef.current.opacity = THREE.MathUtils.damp(coreMaterialRef.current.opacity, target, 7, delta);
-    }
-  });
-
-  return (
-    <group>
-      <mesh geometry={glowGeometry}>
-        <meshBasicMaterial ref={glowMaterialRef} color={route.color} transparent opacity={active ? 0.34 : 0.12} />
-      </mesh>
-      <mesh geometry={coreGeometry}>
-        <meshBasicMaterial ref={coreMaterialRef} color={route.color} transparent opacity={active ? 0.92 : 0.5} />
-      </mesh>
-    </group>
-  );
-}
-
-function RouteSignals({ route, active, routeIndex, reduceMotion }) {
-  const curve = useMemo(() => createCurve(route.points), [route.points]);
-  const signalRefs = useRef([]);
-  const signals = useMemo(() => Array.from({ length: 4 }, (_, index) => ({
-    offset: (index * 0.23 + routeIndex * 0.11) % 1,
-    scale: 0.032 + index * 0.006
-  })), [routeIndex]);
-
-  useFrame(({ clock }) => {
-    signalRefs.current.forEach((signal, index) => {
-      if (!signal) return;
-      const speed = active ? 0.105 : 0.036;
-      const progress = routeSignalProgress(signals[index].offset, clock.elapsedTime, speed);
-      const point = curve.getPointAt(progress);
-      signal.position.copy(point);
-      signal.scale.setScalar(routeSignalScale(signals[index].scale, clock.elapsedTime, index, active));
-      signal.visible = active || index % 2 === 0;
-    });
-  });
-
-  if (reduceMotion) return null;
-
-  return signals.map((signal, index) => (
-    <mesh
-      key={`${routeIndex}-${signal.offset}`}
-      ref={(node) => { signalRefs.current[index] = node; }}
-      scale={signal.scale}
-    >
-      <sphereGeometry args={[1, 12, 12]} />
-      <meshBasicMaterial color={route.color} transparent opacity={active ? 0.92 : 0.38} />
-    </mesh>
-  ));
-}
-
-function NavigationCore({ activeRouteId, reduceMotion }) {
-  const coreRef = useRef(null);
-  const ringRef = useRef(null);
-
-  useFrame(({ clock }, delta) => {
-    if (coreRef.current) {
-      const target = activeRouteId ? 1.28 : 1;
-      const next = THREE.MathUtils.damp(coreRef.current.scale.x, target, 5, delta);
-      coreRef.current.scale.setScalar(next + (reduceMotion ? 0 : Math.sin(clock.elapsedTime * 2.4) * 0.035));
-      coreRef.current.rotation.z = reduceMotion ? 0 : clock.elapsedTime * 0.18;
-    }
-    if (ringRef.current) ringRef.current.rotation.z = reduceMotion ? 0 : -clock.elapsedTime * 0.11;
-  });
-
-  return (
-    <group position={[0, -1.2, 0.55]}>
-      <group ref={coreRef}>
-        <mesh>
-          <ringGeometry args={[0.12, 0.15, 32]} />
-          <meshBasicMaterial color="#94a3b8" transparent opacity={0.65} side={THREE.DoubleSide} />
-        </mesh>
-        <mesh ref={ringRef}>
-          <ringGeometry args={[0.23, 0.238, 48, 1, 0, Math.PI * 1.52]} />
-          <meshBasicMaterial color="#2563eb" transparent opacity={0.5} side={THREE.DoubleSide} />
-        </mesh>
-      </group>
-    </group>
-  );
-}
-
-function RocketNavigator({ activeRouteId, reduceMotion }) {
+function RocketNavigator({ reduceMotion }) {
   const rocketRef = useRef(null);
   const flameRef = useRef(null);
-  const curves = useMemo(() => ({
-    left: createCurve(routeDefinitions.left.points),
-    right: createCurve(routeDefinitions.right.points)
-  }), []);
+  const pointerRef = useRef({ x: 0, y: 0, active: false });
+  const pointerWorldRef = useRef(new THREE.Vector3());
+  const pointerDirectionRef = useRef(new THREE.Vector3());
+  const targetRef = useRef(new THREE.Vector3(0, -0.35, 0.55));
 
-  useFrame(({ clock }, delta) => {
+  useEffect(() => {
+    const handlePointerMove = (event) => {
+      if (event.pointerType === 'touch') return;
+      pointerRef.current.x = (event.clientX / window.innerWidth) * 2 - 1;
+      pointerRef.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
+      pointerRef.current.active = true;
+    };
+    const handlePointerLeave = () => {
+      pointerRef.current.active = false;
+    };
+
+    window.addEventListener('pointermove', handlePointerMove, { passive: true });
+    window.addEventListener('blur', handlePointerLeave);
+    document.documentElement.addEventListener('mouseleave', handlePointerLeave);
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('blur', handlePointerLeave);
+      document.documentElement.removeEventListener('mouseleave', handlePointerLeave);
+    };
+  }, []);
+
+  useFrame(({ camera, clock }, delta) => {
     if (!rocketRef.current) return;
-    const routeId = activeRouteId || (Math.sin(clock.elapsedTime * 0.5) > 0 ? 'right' : 'left');
-    const curve = curves[routeId];
-    const destination = activeRouteId ? 0.72 : 0.18 + Math.sin(clock.elapsedTime * 0.65) * 0.045;
-    const progress = THREE.MathUtils.clamp(destination, 0.08, 0.94);
-    const point = curve.getPointAt(progress);
-    const next = curve.getPointAt((progress + 0.01) % 1);
-    const follow = 1 - Math.exp(-5.8 * delta);
-    rocketRef.current.position.lerp(point, follow);
-    rocketRef.current.lookAt(next);
-    rocketRef.current.rotation.z += Math.PI / 2 + (reduceMotion ? 0 : Math.sin(clock.elapsedTime * 1.2) * 0.018);
-    rocketRef.current.position.y += reduceMotion ? 0 : Math.sin(clock.elapsedTime * 3.1) * 0.035;
+    const pointer = pointerRef.current;
+    const target = targetRef.current;
+
+    if (pointer.active) {
+      const pointerWorld = pointerWorldRef.current.set(pointer.x, pointer.y, 0.5).unproject(camera);
+      const direction = pointerDirectionRef.current.copy(pointerWorld).sub(camera.position).normalize();
+      const distance = (0.55 - camera.position.z) / direction.z;
+      target.copy(camera.position).addScaledVector(direction, distance);
+      target.x = THREE.MathUtils.clamp(target.x, -4.7, 4.7);
+      target.y = THREE.MathUtils.clamp(target.y, -2.65, 2.75);
+      target.z = 0.55;
+    } else {
+      target.set(
+        reduceMotion ? 0 : Math.sin(clock.elapsedTime * 0.55) * 0.45,
+        -0.35 + (reduceMotion ? 0 : Math.cos(clock.elapsedTime * 0.7) * 0.12),
+        0.55
+      );
+    }
+
+    const rocket = rocketRef.current;
+    const previousX = rocket.position.x;
+    const previousY = rocket.position.y;
+    const followSpeed = reduceMotion ? 12 : 7;
+    rocket.position.x = THREE.MathUtils.damp(rocket.position.x, target.x, followSpeed, delta);
+    rocket.position.y = THREE.MathUtils.damp(rocket.position.y, target.y, followSpeed, delta);
+    rocket.position.z = THREE.MathUtils.damp(rocket.position.z, target.z, followSpeed, delta);
+
+    const velocityX = rocket.position.x - previousX;
+    const velocityY = rocket.position.y - previousY;
+    if (Math.abs(velocityX) + Math.abs(velocityY) > 0.0001) {
+      const desiredRotation = Math.atan2(velocityY, velocityX);
+      const angleDelta = Math.atan2(
+        Math.sin(desiredRotation - rocket.rotation.z),
+        Math.cos(desiredRotation - rocket.rotation.z)
+      );
+      rocket.rotation.z += angleDelta * (1 - Math.exp(-10 * delta));
+    }
 
     if (flameRef.current) {
-      const pulse = reduceMotion ? 1 : 1 + Math.sin(clock.elapsedTime * 18) * 0.2;
-      flameRef.current.scale.set(0.85 * pulse, 1.15 + pulse * 0.18, 0.85 * pulse);
+      const pulse = reduceMotion ? 1 : 1 + Math.sin(clock.elapsedTime * 16) * 0.12;
+      flameRef.current.scale.set(0.88 * pulse, 1.1 + pulse * 0.12, 0.88 * pulse);
     }
   });
 
   return (
-    <group ref={rocketRef} scale={0.78}>
-      <mesh rotation={[0, 0, -Math.PI / 2]} position={[0.52, 0, 0]}>
-        <coneGeometry args={[0.235, 0.48, 32]} />
-        <meshStandardMaterial color="#e2e8f0" roughness={0.36} metalness={0.28} />
+    <group ref={rocketRef} position={[0, -0.35, 0.55]} scale={0.64}>
+      <mesh rotation={[0, 0, -Math.PI / 2]} position={[0.54, 0, 0]}>
+        <coneGeometry args={[0.22, 0.5, 32]} />
+        <meshStandardMaterial color={rocketColors.red} roughness={0.36} metalness={0.12} />
       </mesh>
-      <mesh rotation={[0, 0, Math.PI / 2]} position={[-0.08, 0, 0]}>
-        <capsuleGeometry args={[0.22, 0.86, 12, 24]} />
-        <meshStandardMaterial color="#f8fafc" roughness={0.32} metalness={0.22} />
+      <mesh rotation={[0, 0, -Math.PI / 2]} position={[-0.08, 0, 0]} scale={[1, 1, 0.9]}>
+        <latheGeometry args={[rocketBodyProfile, 48]} />
+        <meshStandardMaterial color={rocketColors.shell} roughness={0.42} metalness={0.08} />
       </mesh>
-      <mesh rotation={[0, Math.PI / 2, 0]} position={[0.28, 0, 0]}>
-        <cylinderGeometry args={[0.232, 0.232, 0.1, 32]} />
-        <meshStandardMaterial color="#d36a5f" roughness={0.4} metalness={0.2} />
+      <mesh rotation={[0, 0, Math.PI / 2]} position={[0.25, 0, 0]}>
+        <cylinderGeometry args={[0.19, 0.205, 0.09, 32]} />
+        <meshStandardMaterial color={rocketColors.shellShadow} roughness={0.42} metalness={0.16} />
       </mesh>
-      <mesh position={[0.1, 0.225, 0.11]}>
-        <sphereGeometry args={[0.105, 24, 24]} />
-        <meshStandardMaterial color="#0f3b66" emissive="#2563eb" emissiveIntensity={0.16} roughness={0.12} metalness={0.62} />
+      <mesh position={[0.08, 0, 0.225]}>
+        <circleGeometry args={[0.105, 32]} />
+        <meshStandardMaterial color={rocketColors.glass} emissive={rocketColors.glass} emissiveIntensity={0.16} roughness={0.16} metalness={0.24} />
       </mesh>
-      <mesh position={[-0.44, 0.24, 0]} rotation={[0, 0, -0.62]}>
-        <coneGeometry args={[0.13, 0.42, 3]} />
-        <meshStandardMaterial color="#d36a5f" roughness={0.42} metalness={0.16} />
+      <mesh position={[0.08, 0, 0.23]}>
+        <torusGeometry args={[0.112, 0.018, 12, 32]} />
+        <meshStandardMaterial color={rocketColors.glassRim} roughness={0.34} metalness={0.28} />
       </mesh>
-      <mesh position={[-0.44, -0.24, 0]} rotation={[0, 0, 0.62]}>
-        <coneGeometry args={[0.13, 0.42, 3]} />
-        <meshStandardMaterial color="#d36a5f" roughness={0.42} metalness={0.16} />
+      <mesh position={[-0.43, 0.22, 0]} rotation={[0, 0, -0.62]}>
+        <coneGeometry args={[0.12, 0.38, 3]} />
+        <meshStandardMaterial color={rocketColors.red} roughness={0.4} metalness={0.08} />
       </mesh>
-      <mesh rotation={[0, 0, Math.PI / 2]} position={[-0.68, 0, 0]}>
-        <cylinderGeometry args={[0.16, 0.11, 0.18, 24]} />
-        <meshStandardMaterial color="#475569" roughness={0.34} metalness={0.72} />
+      <mesh position={[-0.43, -0.22, 0]} rotation={[0, 0, 0.62]}>
+        <coneGeometry args={[0.12, 0.38, 3]} />
+        <meshStandardMaterial color={rocketColors.redShadow} roughness={0.4} metalness={0.08} />
       </mesh>
-      <mesh ref={flameRef} position={[-0.84, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-        <coneGeometry args={[0.13, 0.42, 24]} />
-        <meshBasicMaterial color="#fbbf24" transparent opacity={0.82} />
+      <mesh rotation={[0, 0, Math.PI / 2]} position={[-0.66, 0, 0]}>
+        <cylinderGeometry args={[0.155, 0.105, 0.18, 24]} />
+        <meshStandardMaterial color={rocketColors.teal} roughness={0.34} metalness={0.38} />
       </mesh>
-      <mesh position={[-0.96, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-        <coneGeometry args={[0.07, 0.28, 20]} />
-        <meshBasicMaterial color="#fb7185" transparent opacity={0.5} />
+      <mesh ref={flameRef} position={[-0.83, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <coneGeometry args={[0.12, 0.38, 24]} />
+        <meshBasicMaterial color={rocketColors.flame} transparent opacity={0.88} />
+      </mesh>
+      <mesh position={[-0.94, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <coneGeometry args={[0.06, 0.24, 20]} />
+        <meshBasicMaterial color={rocketColors.flameCore} transparent opacity={0.78} />
       </mesh>
     </group>
   );
 }
 
-function CampaignPathScene({ activeRouteId, reduceMotion }) {
+function CampaignPathScene({ reduceMotion }) {
   return (
     <Canvas
       className="campaign-map-canvas"
@@ -241,18 +191,8 @@ function CampaignPathScene({ activeRouteId, reduceMotion }) {
     >
       <ambientLight intensity={0.82} />
       <pointLight position={[0, 2.2, 2]} intensity={2.15} color="#ffffff" />
-      <pointLight position={[3, 0.5, -3]} intensity={1.25} color="#2563eb" />
-      <NavigationCore activeRouteId={activeRouteId} reduceMotion={reduceMotion} />
-      {Object.entries(routeDefinitions).map(([id, route], routeIndex) => {
-        const active = activeRouteId === id;
-        return (
-          <group key={id}>
-            <RouteLine route={route} active={active} reduceMotion={reduceMotion} />
-            <RouteSignals route={route} active={active} routeIndex={routeIndex} reduceMotion={reduceMotion} />
-          </group>
-        );
-      })}
-      <RocketNavigator activeRouteId={activeRouteId} reduceMotion={reduceMotion} />
+      <pointLight position={[3, 0.5, -3]} intensity={1.05} color="#60a5fa" />
+      <RocketNavigator reduceMotion={reduceMotion} />
     </Canvas>
   );
 }
@@ -262,29 +202,6 @@ function FallbackLogo({ item }) {
     <span className="campaign-node-fallback" style={{ color: item.color }}>
       {item.name.slice(0, 2).toUpperCase()}
     </span>
-  );
-}
-
-function InterfaceTelemetry({ activeRouteId, viewState }) {
-  const status = viewState === 'tree'
-    ? 'Directory synchronized'
-    : activeRouteId
-      ? `${activeRouteId} vector acquired`
-      : 'Awaiting direction';
-
-  return (
-    <div className="interface-telemetry" aria-hidden="true">
-      <div className="interface-telemetry-status">
-        <span className="interface-telemetry-pulse" />
-        <span>{status}</span>
-      </div>
-      <div className="interface-telemetry-axis">
-        <span>01</span>
-        <i />
-        <span>02</span>
-      </div>
-      <div className="interface-telemetry-signature">ADI / PORTFOLIO SYSTEM</div>
-    </div>
   );
 }
 
@@ -471,7 +388,6 @@ function CampaignTreeScreen({ target, branches, selectedNodeId, onBack, onSelect
 }
 
 export default function LandingCampaignMap({ selectedNodeId, onSelectNode }) {
-  const [activeRouteId, setActiveRouteId] = useState(null);
   const [activeTreeId, setActiveTreeId] = useState(null);
   const [viewState, setViewState] = useState('landing');
   const reduceMotion = useReducedMotion();
@@ -481,7 +397,6 @@ export default function LandingCampaignMap({ selectedNodeId, onSelectNode }) {
     : [];
 
   function selectTree(target) {
-    setActiveRouteId(target.routeId);
     setActiveTreeId(target.id);
     setViewState('tree');
   }
@@ -489,7 +404,6 @@ export default function LandingCampaignMap({ selectedNodeId, onSelectNode }) {
   function returnToLanding() {
     setViewState('landing');
     setActiveTreeId(null);
-    setActiveRouteId(null);
   }
 
   function selectNode(item, branch) {
@@ -503,10 +417,7 @@ export default function LandingCampaignMap({ selectedNodeId, onSelectNode }) {
 
   return (
     <section className="campaign-map" aria-label="Interactive career campaign map">
-      <CampaignPathScene activeRouteId={activeRouteId} reduceMotion={reduceMotion} />
-      <InterfaceTelemetry activeRouteId={activeRouteId} viewState={viewState} />
-
-      {viewState !== 'tree' && <div className="campaign-horizon" aria-hidden="true" />}
+      <CampaignPathScene reduceMotion={reduceMotion} />
 
       <AnimatePresence mode="wait" initial={false}>
         {viewState === 'landing' && (
@@ -525,22 +436,17 @@ export default function LandingCampaignMap({ selectedNodeId, onSelectNode }) {
                 type="button"
                 className={`campaign-gate-card campaign-gate-card--${target.routeId}`}
                 style={{ '--node-color': target.color }}
-                onMouseEnter={() => setActiveRouteId(target.routeId)}
-                onMouseLeave={() => setActiveRouteId(null)}
-                onFocus={() => setActiveRouteId(target.routeId)}
-                onBlur={() => setActiveRouteId(null)}
                 onClick={() => selectTree(target)}
-                initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 24, rotateX: -5 }}
-                animate={{ opacity: 1, y: 0, rotateX: 0 }}
-                whileHover={reduceMotion ? undefined : { y: -8, scale: 1.015 }}
+                initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                whileHover={reduceMotion ? undefined : { y: -4 }}
                 whileTap={reduceMotion ? undefined : { scale: 0.985 }}
                 transition={{ ...motionSpringSoft, delay: reduceMotion ? 0 : sequenceDelay(index, 0.1, 0.18) }}
               >
-                <i className="campaign-gate-scan" aria-hidden="true" />
                 <span>{target.eyebrow}</span>
                 <strong>{target.label}</strong>
                 <small>{target.description}</small>
-                <em>Open vector <b>↗</b></em>
+                <em>Explore <b>↗</b></em>
               </MotionButton>
             ))}
           </MotionDiv>

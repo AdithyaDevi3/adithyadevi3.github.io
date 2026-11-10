@@ -25,17 +25,19 @@ export default function App() {
         <MotionDiv
           key={route}
           className={`page-stage page-stage--${route}`}
-          initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.985, filter: 'blur(8px)' }}
-          animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-          exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 1.012, filter: 'blur(6px)' }}
-          transition={{ duration: reduceMotion ? 0.12 : 0.48, ease: motionEase }}
+          initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -6 }}
+          transition={{ duration: reduceMotion ? 0.12 : 0.32, ease: motionEase }}
         >
           {route === 'home' ? <HomePage /> : <AboutPage />}
         </MotionDiv>
       </AnimatePresence>
 
-      {route === 'home' && <Header />}
-      <Navigation route={route} setRoute={setRoute} />
+      <div className="site-topbar">
+        <Header />
+        <Navigation route={route} setRoute={setRoute} />
+      </div>
       <SocialLinks />
     </div>
   );
