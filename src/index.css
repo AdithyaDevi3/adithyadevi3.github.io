@@ -1090,7 +1090,7 @@ main, body {
   flex-direction: column;
   align-items: flex-start;
   justify-content: space-between;
-  padding: 16px;
+  padding: 16px 16px 62px;
   border: 1px solid #c8c4bd;
   border-radius: 0;
   background: #ffffff;
@@ -1184,24 +1184,40 @@ main, body {
   -webkit-line-clamp: 5;
 }
 
-.project-flip-card-link {
+.project-flip-card-actions {
   position: absolute;
-  left: 16px;
-  bottom: 16px;
-  z-index: 2;
-  color: #0f172a;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  opacity: 0;
-  pointer-events: none;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
-  transition: opacity 120ms ease;
+  left: 14px;
+  right: 14px;
+  bottom: 14px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.project-flip-card--flipped .project-flip-card-link {
-  opacity: 1;
-  pointer-events: auto;
+.project-card-action {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 11px;
+  border: 1px solid #d1d5db;
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.project-card-action--live {
+  border-color: #111111;
+  background: #111111;
+  color: #ffffff;
+}
+
+.project-card-action--repo {
+  background: rgba(255, 255, 255, 0.82);
+  color: #111111;
 }
 
 .campaign-branch {
@@ -1840,7 +1856,7 @@ main, body {
   .campaign-mission-copy,
   .project-flip-face,
   .project-flip-face::before,
-  .project-flip-card-link,
+  .project-card-action,
   .social-dock-link,
   .social-dock-link span {
     transition-duration: 1ms !important;

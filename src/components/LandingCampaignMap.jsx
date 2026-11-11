@@ -283,19 +283,28 @@ function ProjectFlipCard({ item, index }) {
           </div>
         </MotionDiv>
       </MotionButton>
-      <MotionAnchor
-        className="project-flip-card-link"
-        href={item.repoUrl}
-        target="_blank"
-        rel="noreferrer"
-        tabIndex={flipped ? 0 : -1}
-        aria-hidden={!flipped}
-        animate={{ opacity: flipped ? 1 : 0, y: flipped ? 0 : 5 }}
-        whileHover={reduceMotion ? undefined : { x: 3 }}
-        transition={{ duration: reduceMotion ? 0.01 : motionDuration.fast, ease: motionEase }}
-      >
-        View repository ↗
-      </MotionAnchor>
+      <div className="project-flip-card-actions">
+        {item.liveUrl && (
+          <MotionAnchor
+            className="project-card-action project-card-action--live"
+            href={item.liveUrl}
+            target="_blank"
+            rel="noreferrer"
+            whileHover={reduceMotion ? undefined : { y: -2 }}
+          >
+            {item.liveLabel || 'Open live site'} ↗
+          </MotionAnchor>
+        )}
+        <MotionAnchor
+          className="project-card-action project-card-action--repo"
+          href={item.repoUrl}
+          target="_blank"
+          rel="noreferrer"
+          whileHover={reduceMotion ? undefined : { y: -2 }}
+        >
+          Repository ↗
+        </MotionAnchor>
+      </div>
     </MotionArticle>
   );
 }
